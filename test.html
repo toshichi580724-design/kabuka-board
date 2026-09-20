@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>データ取得 接続テスト</title>
+<style>
+:root{--bg:#F1F4F8;--surface:#fff;--line:#D7DDE6;--ink:#111720;--muted:#5D6877;--ok:#0F8A45;--ng:#CE2B25;--accent:#12666F;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0A0E13;--surface:#151C24;--line:#2A333F;--ink:#E8EDF4;--muted:#8A97A8;--ok:#35CE74;--ng:#FF6159;--accent:#2FA3AD;color-scheme:dark}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;font-size:14px;line-height:1.6}
+.wrap{max-width:900px;margin:0 auto;padding:18px 14px 50px}
+h1{font-size:18px;margin:0 0 4px}
+p.lead{color:var(--muted);font-size:12.5px;margin:0 0 14px}
+.bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+button{font:inherit;background:var(--accent);color:#fff;border:0;border-radius:8px;padding:9px 14px;cursor:pointer;font-size:13px}
+button.sec{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.sum{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:13px}
+.row{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:7px}
+.top{display:flex;align-items:center;gap:9px}
+.badge{font-size:11px;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap;flex:none}
+.badge.ok{background:rgba(15,138,69,.14);color:var(--ok)}
+.badge.ng{background:rgba(206,43,37,.13);color:var(--ng)}
+.badge.wait{background:rgba(120,130,145,.16);color:var(--muted)}
+.nm{font-weight:700;font-size:13px;flex:1 1 auto;min-width:0}
+.ms{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.det{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;color:var(--muted);margin-top:5px;word-break:break-all;white-space:pre-wrap;max-height:78px;overflow:auto}
+textarea{width:100%;height:150px;font-family:ui-monospace,monospace;font-size:11px;border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--surface);color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>データ取得 接続テスト</h1>
+  <p class="lead">株価データの取得先を、このブラウザから順に試します。緑が「使える経路」です。終わったら「結果をコピー」でテキストを貼って送ってください。</p>
+  <div class="bar">
+    <button id="run">もう一度テスト</button>
+    <button class="sec" id="copy">結果をコピー</button>
+  </div>
+  <div class="sum" id="sum">テスト中…</div>
+  <div id="list"></div>
+  <textarea id="out" readonly placeholder="結果テキスト"></textarea>
+</div>
+<script>
+(function(){
+  "use strict";
+  var P_A = function(u){ return "https://api.allorigins.win/raw?url=" + encodeURIComponent(u); };
+  var P_B = function(u){ return "https://api.codetabs.com/v1/proxy/?quest=" + encodeURIComponent(u); };
+  var P_C = function(u){ return "https://corsproxy.io/?url=" + encodeURIComponent(u); };
+  var P_D = function(u){ return "https://thingproxy.freeboard.io/fetch/" + u; };
+
+  var Y = "https://query1.finance.yahoo.com/v8/finance/chart/7203.T?range=1d&interval=5m";
+  var Y2 = "https://query2.finance.yahoo.com/v8/finance/chart/AAPL?range=1d&interval=5m";
+  var SQ_JP = "https://stooq.com/q/l/?s=7203.jp&f=sd2t2ohlcv&h&e=csv";
+  var SQ_US = "https://stooq.com/q/l/?s=aapl.us&f=sd2t2ohlcv&h&e=csv";
+  var SQ_IDX = "https://stooq.com/q/l/?s=^nkx&f=sd2t2ohlcv&h&e=csv";
+  var SQ_FX = "https://stooq.com/q/l/?s=usdjpy&f=sd2t2ohlcv&h&e=csv";
+  var SQ_HIST = "https://stooq.com/q/d/l/?s=7203.jp&i=d";
+
+  var TESTS = [
+    { n:"Yahoo 直接（7203.T）", u:Y },
+    { n:"Yahoo 中継A allorigins", u:P_A(Y) },
+    { n:"Yahoo 中継B codetabs", u:P_B(Y) },
+    { n:"Yahoo 中継C corsproxy", u:P_C(Y) },
+    { n:"Yahoo 直接（AAPL / query2）", u:Y2 },
+    { n:"Stooq 直接（日本株）", u:SQ_JP },
+    { n:"Stooq 中継A（日本株）", u:P_A(SQ_JP) },
+    { n:"Stooq 中継B（日本株）", u:P_B(SQ_JP) },
+    { n:"Stooq 中継A（米国株）", u:P_A(SQ_US) },
+    { n:"Stooq 中継A（日経225）", u:P_A(SQ_IDX) },
+    { n:"Stooq 中継A（ドル円）", u:P_A(SQ_FX) },
+    { n:"Stooq 中継A（日足履歴）", u:P_A(SQ_HIST) },
+    { n:"Binance 直接（BTC/USDT）", u:"https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=5m&limit=5" },
+    { n:"CoinGecko 直接（BTC/JPY）", u:"https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=jpy" },
+    { n:"Frankfurter 直接（USD/JPY）", u:"https://api.frankfurter.app/latest?from=USD&to=JPY" },
+    { n:"中継A 自体の疎通確認", u:P_A("https://example.com") },
+    { n:"中継D thingproxy", u:P_D(Y) }
+  ];
+
+  var list = document.getElementById("list");
+  var sum = document.getElementById("sum");
+  var out = document.getElementById("out");
+  var rows = [];
+
+  function build(){
+    list.textContent = "";
+    rows = TESTS.map(function(t){
+      var el = document.createElement("div");
+      el.className = "row";
+      el.innerHTML = '<div class="top"><span class="badge wait">待機</span><span class="nm"></span><span class="ms"></span></div><div class="det"></div>';
+      el.querySelector(".nm").textContent = t.n;
+      list.appendChild(el);
+      return el;
+    });
+  }
+
+  function run(){
+    build();
+    var results = [];
+    var done = 0;
+    sum.textContent = "テスト中… (0/" + TESTS.length + ")";
+    TESTS.forEach(function(t, i){
+      setTimeout(function(){
+        var el = rows[i], badge = el.querySelector(".badge"), ms = el.querySelector(".ms"), det = el.querySelector(".det");
+        badge.className = "badge wait"; badge.textContent = "実行中";
+        var t0 = Date.now();
+        var ac = new AbortController();
+        var timer = setTimeout(function(){ ac.abort(); }, 12000);
+        fetch(t.u, { signal: ac.signal, cache:"no-store", referrerPolicy:"no-referrer" })
+          .then(function(r){
+            return r.text().then(function(txt){ return { status:r.status, ok:r.ok, txt:txt }; });
+          })
+          .then(function(r){
+            clearTimeout(timer);
+            var dt = Date.now() - t0;
+            var sample = (r.txt || "").replace(/\s+/g," ").slice(0,150);
+            if(r.ok && sample.length){
+              badge.className = "badge ok"; badge.textContent = "OK " + r.status;
+              results.push("OK   " + t.n + " (" + dt + "ms) :: " + sample.slice(0,90));
+            } else {
+              badge.className = "badge ng"; badge.textContent = "NG " + r.status;
+              results.push("NG   " + t.n + " HTTP " + r.status + " :: " + sample.slice(0,90));
+            }
+            ms.textContent = dt + "ms";
+            det.textContent = sample || "(空のレスポンス)";
+          })
+          .catch(function(e){
+            clearTimeout(timer);
+            var dt = Date.now() - t0;
+            var msg = (e && e.name === "AbortError") ? "タイムアウト" : "ブロック/通信失敗 (" + ((e && e.message) || e) + ")";
+            badge.className = "badge ng"; badge.textContent = "NG";
+            ms.textContent = dt + "ms";
+            det.textContent = msg;
+            results.push("NG   " + t.n + " :: " + msg);
+          })
+          .then(function(){
+            done++;
+            sum.textContent = "テスト中… (" + done + "/" + TESTS.length + ")";
+            if(done === TESTS.length){
+              var okc = results.filter(function(r){ return r.indexOf("OK") === 0; }).length;
+              sum.innerHTML = "<b>完了：" + okc + " / " + TESTS.length + " の経路が利用可能</b>";
+              out.value = "UA: " + navigator.userAgent + "\n" + location.href + "\n\n" + results.join("\n");
+            }
+          });
+      }, i * 220);
+    });
+  }
+
+  document.getElementById("run").addEventListener("click", run);
+  document.getElementById("copy").addEventListener("click", function(){
+    out.select();
+    if(navigator.clipboard) navigator.clipboard.writeText(out.value).then(function(){ alert("コピーしました"); }, function(){ alert("上の枠を長押しして手動でコピーしてください"); });
+    else alert("上の枠を長押しして手動でコピーしてください");
+  });
+  run();
+})();
+</script>
+</body>
+</html>
