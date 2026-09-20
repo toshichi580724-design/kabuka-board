@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>マイ株価ボード</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F4F6F9; --surface:#FFFFFF; --surface-2:#EAEEF4; --line:#D9DFE8;
+  --ink:#131A24; --muted:#63707F; --accent:#0E6E78; --accent-ink:#FFFFFF;
+  --up:#D23F3A; --down:#2563C9;
+  --shadow:0 1px 2px rgba(19,26,36,.06), 0 6px 18px rgba(19,26,36,.05);
+  --chart-h:148px; --card-min:284px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1218; --surface:#151C25; --surface-2:#1D2631; --line:#2A3542;
+    --ink:#E7ECF3; --muted:#8B97A8; --accent:#33A6B0; --accent-ink:#06171A;
+    --up:#FF5C54; --down:#5A95FF;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.28);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1218; --surface:#151C25; --surface-2:#1D2631; --line:#2A3542;
+  --ink:#E7ECF3; --muted:#8B97A8; --accent:#33A6B0; --accent-ink:#06171A;
+  --up:#FF5C54; --down:#5A95FF;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.28);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Zen Kaku Gothic New",system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+  font-size:14px; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:"Roboto Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+
+/* ---------- header ---------- */
+.site{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:30;
+  background:var(--bg); border-bottom:1px solid var(--line);
+}
+.site-in{
+  max-width:1460px; margin:0 auto; padding-inline:16px;
+  padding-block:10px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+}
+.brand{display:flex;align-items:baseline;gap:9px;margin-right:auto}
+.brand h1{font-size:17px;font-weight:700;letter-spacing:.02em;margin:0}
+.brand .tag{font-size:10.5px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.clocks{display:flex;gap:8px;flex-wrap:wrap}
+.clock{
+  display:flex;align-items:center;gap:7px;padding:4px 9px;border-radius:999px;
+  background:var(--surface);border:1px solid var(--line);font-size:11.5px;white-space:nowrap;
+}
+.clock b{font-weight:500;font-size:12px}
+.clock .city{color:var(--muted);letter-spacing:.06em}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex:none}
+.dot.open{background:var(--up);box-shadow:0 0 0 3px color-mix(in srgb,var(--up) 22%,transparent)}
+.dot.break{background:#D99A2B}
+.state{color:var(--muted)}
+
+/* ---------- toolbar ---------- */
+.toolbar{
+  max-width:1460px;margin:0 auto;padding-inline:16px;padding-block:14px 10px;
+  display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;
+}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:10.5px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.add{display:flex;gap:6px}
+.add .btn{flex:none;white-space:nowrap}
+input[type=text],select{
+  background:var(--surface);color:var(--ink);border:1px solid var(--line);
+  border-radius:7px;padding:8px 10px;font:inherit;font-size:13px;min-height:38px;
+}
+input[type=text]{width:min(230px,52vw)}
+select{padding-right:26px}
+.btn{
+  border:1px solid var(--line);background:var(--surface);border-radius:7px;
+  padding:8px 13px;min-height:38px;cursor:pointer;font-size:13px;transition:background .15s,border-color .15s;
+}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:500}
+.btn.primary:hover{filter:brightness(1.08)}
+.spacer{flex:1 1 auto}
+.seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:8px 11px;cursor:pointer;font-size:12.5px;color:var(--muted);min-height:38px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:500}
+
+/* ---------- grid ---------- */
+.wrap{max-width:1460px;margin:0 auto;padding-inline:16px;padding-block:6px 48px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--card-min),1fr));gap:10px}
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:9px;
+  box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;
+  transition:border-color .15s,transform .15s;
+}
+.card:hover{border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.card.dragging{opacity:.4}
+.card.over{border-color:var(--accent)}
+.card-head{
+  display:flex;align-items:center;gap:8px;padding:7px 6px 7px 9px;
+  background:var(--surface-2);border-bottom:1px solid var(--line);min-height:40px;
+}
+.flag{font-size:16px;line-height:1;flex:none;width:21px;text-align:center;
+  font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.titles{display:flex;flex-direction:column;min-width:0;flex:1 1 auto;gap:1px}
+.nm{font-size:13.5px;font-weight:700;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sub{font-family:"Roboto Mono",monospace;font-size:9.5px;letter-spacing:.04em;color:var(--muted);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ctl{display:none;gap:1px;flex:none}
+body.editing .ctl{display:flex}
+body.editing .card{border-style:dashed}
+@media (hover:hover){ .card:hover .ctl,.card:focus-within .ctl{display:flex} }
+.ico{
+  border:0;background:transparent;color:var(--muted);cursor:pointer;
+  width:22px;height:22px;border-radius:5px;display:grid;place-items:center;font-size:11px;line-height:1;flex:none;
+}
+.ico:hover{background:var(--surface);color:var(--ink)}
+.ico.del:hover{color:var(--up)}
+.chart{position:relative;height:var(--chart-h);background:var(--surface)}
+.chart iframe{width:100%;height:100%;border:0;display:block}
+.hit{
+  position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;
+  cursor:pointer;padding:0;
+}
+.hit:hover{background:color-mix(in srgb,var(--accent) 6%,transparent)}
+.fallback{
+  position:absolute;inset:0;display:none;place-items:center;text-align:center;
+  padding:12px;font-size:11.5px;color:var(--muted);background:var(--surface);gap:6px;
+}
+.chart[data-failed="1"] .fallback{display:grid}
+
+/* ---------- empty / footer ---------- */
+.empty{
+  border:1px dashed var(--line);border-radius:10px;padding:28px 18px;text-align:center;color:var(--muted);
+}
+.chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 11px;font-size:12px;cursor:pointer}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+footer{max-width:1460px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font-size:11.5px;line-height:1.8}
+footer .rule{height:1px;background:var(--line);margin-bottom:14px}
+.legend{display:inline-flex;align-items:center;gap:5px;margin-right:12px}
+.swatch{width:9px;height:9px;border-radius:2px;display:inline-block}
+
+/* ---------- dialog ---------- */
+dialog{
+  border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);
+  padding:0;width:min(1120px,94vw);max-width:94vw;box-shadow:0 24px 70px rgba(0,0,0,.35);
+}
+dialog::backdrop{background:rgba(8,12,18,.6)}
+.dlg-head{display:flex;align-items:center;gap:10px;padding:11px 12px 11px 14px;border-bottom:1px solid var(--line)}
+.dlg-head h2{font-size:14px;margin:0;font-weight:700}
+.dlg-head .sym{font-family:"Roboto Mono",monospace;font-size:11px;color:var(--muted);background:var(--surface-2);border-radius:4px;padding:3px 7px;white-space:nowrap}
+.dlg-body{height:min(680px,76vh)}
+.dlg-body iframe{width:100%;height:100%;border:0;display:block}
+@media (max-width:560px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .wrap{padding-inline:12px}
+  .nm{font-size:12px}
+  .sub{font-size:9px}
+  .card-head{padding:6px 7px;gap:6px;min-height:38px}
+  .brand h1{font-size:15px}
+  .toolbar{padding-block:12px 8px}
+  input[type=text]{width:100%}
+  .field.add-field{flex:1 1 100%}
+  .add{width:100%}
+  .add input{flex:1 1 auto}
+  .btn{padding-inline:11px;font-size:12.5px;white-space:nowrap}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="site-in">
+    <div class="brand">
+      <h1>マイ株価ボード</h1>
+      <span class="tag">watchlist</span>
+    </div>
+    <div class="clocks" id="clocks">
+      <div class="clock"><span class="dot" id="tk-dot"></span><span class="city">東京</span><b class="mono" id="tk-time">--:--</b><span class="state" id="tk-state">—</span></div>
+      <div class="clock"><span class="dot" id="ny-dot"></span><span class="city">NY</span><b class="mono" id="ny-time">--:--</b><span class="state" id="ny-state">—</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="field add-field">
+    <label for="sym-input">銘柄を登録</label>
+    <form class="add" id="add-form">
+      <input type="text" id="sym-input" list="popular" placeholder="7203 / AAPL / ドル円" autocomplete="off" spellcheck="false">
+      <button class="btn primary" type="submit">追加</button>
+    </form>
+    <datalist id="popular">
+      <option value="7203" label="トヨタ自動車"></option>
+      <option value="6758" label="ソニーグループ"></option>
+      <option value="9984" label="ソフトバンクG"></option>
+      <option value="8035" label="東京エレクトロン"></option>
+      <option value="6861" label="キーエンス"></option>
+      <option value="9432" label="NTT"></option>
+      <option value="AAPL" label="アップル"></option>
+      <option value="NVDA" label="エヌビディア"></option>
+      <option value="TSLA" label="テスラ"></option>
+      <option value="日経" label="日経225"></option>
+      <option value="ダウ" label="NYダウ"></option>
+      <option value="ドル円" label="USD/JPY"></option>
+      <option value="ビットコイン" label="BTC/JPY"></option>
+    </datalist>
+  </div>
+
+  <div class="field">
+    <label>期間</label>
+    <div class="seg" id="range-seg" role="group" aria-label="表示期間">
+      <button type="button" data-range="1D">1日</button>
+      <button type="button" data-range="1M">1ヶ月</button>
+      <button type="button" data-range="3M">3ヶ月</button>
+      <button type="button" data-range="12M">1年</button>
+      <button type="button" data-range="ALL">全期間</button>
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="size-sel">カード</label>
+    <select id="size-sel">
+      <option value="sm">小</option>
+      <option value="md">中</option>
+      <option value="lg">大</option>
+    </select>
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="field">
+    <label for="theme-sel">表示</label>
+    <select id="theme-sel">
+      <option value="system">自動</option>
+      <option value="light">ライト</option>
+      <option value="dark">ダーク</option>
+    </select>
+  </div>
+
+  <button class="btn" type="button" id="edit-btn" aria-pressed="false">編集</button>
+  <button class="btn" type="button" id="share-btn">共有URLをコピー</button>
+  <button class="btn" type="button" id="reset-btn">初期状態に戻す</button>
+</div>
+
+<main class="wrap">
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" hidden>
+    <div>登録銘柄がありません。上の入力欄からコードを追加してください。</div>
+    <div class="chips" id="empty-chips"></div>
+  </div>
+</main>
+
+<footer>
+  <div class="rule"></div>
+  <div>
+    <span class="legend"><span class="swatch" style="background:var(--up)"></span>上昇</span>
+    <span class="legend"><span class="swatch" style="background:var(--down)"></span>下落</span>
+    <span>チャートは TradingView 配信。FX・暗号資産・主要先物はリアルタイム、日本株と一部指数は20分程度の遅延があります。</span>
+  </div>
+  <div>市場ステータスは通常取引時間（東証 9:00–11:30 / 12:30–15:30、NYSE 9:30–16:00 現地時間）からの推定で、祝日は考慮していません。登録銘柄はこのブラウザに保存され、共有URLにも含まれます。</div>
+</footer>
+
+<dialog id="detail">
+  <div class="dlg-head">
+    <span class="sym mono" id="dlg-sym">—</span>
+    <h2 id="dlg-name">—</h2>
+    <span class="spacer"></span>
+    <a class="btn" id="dlg-tv" href="#" target="_blank" rel="noopener">TradingViewで開く</a>
+    <button class="btn" type="button" id="dlg-close">閉じる</button>
+  </div>
+  <div class="dlg-body" id="dlg-body"></div>
+</dialog>
+
+<script>
+(function(){
+  "use strict";
+  var LS_KEY = "kabuka-board-v1";
+
+  var DEFAULTS = ["TSE:7203","TSE:6758","TSE:8035","TSE:9432","NASDAQ:AAPL","NASDAQ:NVDA","TVC:NI225","FX:USDJPY","BITFLYER:BTCJPY"];
+
+  var NAMES = {
+    "TVC:NI225":"日経225","TVC:DJI":"NYダウ","TVC:SPX":"S&P500","TVC:NDX":"ナスダック100",
+    "TVC:IXIC":"ナスダック総合","TVC:VIX":"VIX指数","TVC:US10Y":"米10年債利回り","TVC:GOLD":"金",
+    "TVC:USOIL":"WTI原油","FX:USDJPY":"ドル円","FX:EURJPY":"ユーロ円","FX:EURUSD":"ユーロドル",
+    "BITFLYER:BTCJPY":"ビットコイン円","TSE:7203":"トヨタ自動車","TSE:6758":"ソニーグループ",
+    "TSE:9984":"ソフトバンクG","TSE:8306":"三菱UFJ","TSE:6861":"キーエンス","TSE:8035":"東京エレクトロン",
+    "TSE:9432":"NTT","TSE:6501":"日立製作所","TSE:7974":"任天堂","TSE:9433":"KDDI","TSE:4063":"信越化学",
+    "NASDAQ:AAPL":"アップル","NASDAQ:NVDA":"エヌビディア","NASDAQ:MSFT":"マイクロソフト",
+    "NASDAQ:TSLA":"テスラ","NASDAQ:AMZN":"アマゾン","NASDAQ:GOOGL":"アルファベット",
+    "NASDAQ:META":"メタ","NYSE:BRK.B":"バークシャー"
+  };
+
+  var ALIASES = {
+    "日経":"TVC:NI225","日経平均":"TVC:NI225","日経225":"TVC:NI225","nikkei":"TVC:NI225","nk225":"TVC:NI225",
+    "ダウ":"TVC:DJI","ダウ平均":"TVC:DJI","dow":"TVC:DJI","djia":"TVC:DJI",
+    "sp500":"TVC:SPX","s&p500":"TVC:SPX","spx":"TVC:SPX",
+    "ナスダック":"TVC:NDX","nasdaq":"TVC:NDX","ndx":"TVC:NDX",
+    "ドル円":"FX:USDJPY","usdjpy":"FX:USDJPY","usd/jpy":"FX:USDJPY",
+    "ユーロ円":"FX:EURJPY","eurjpy":"FX:EURJPY","ユーロドル":"FX:EURUSD","eurusd":"FX:EURUSD",
+    "金":"TVC:GOLD","ゴールド":"TVC:GOLD","gold":"TVC:GOLD","原油":"TVC:USOIL","oil":"TVC:USOIL",
+    "ビットコイン":"BITFLYER:BTCJPY","btc":"BITFLYER:BTCJPY","btcjpy":"BITFLYER:BTCJPY",
+    "vix":"TVC:VIX","米10年債":"TVC:US10Y","us10y":"TVC:US10Y"
+  };
+
+  var SIZES = { sm:"186px", md:"236px", lg:"310px" };
+  var CHART_H = { sm:"122px", md:"152px", lg:"196px" };
+
+  var SUBS = {
+    "TVC:NI225":"NIKKEI 225","TVC:DJI":"DOW 30","TVC:SPX":"S&P 500","TVC:NDX":"NASDAQ 100",
+    "TVC:IXIC":"NASDAQ COMP","TVC:VIX":"VIX","TVC:US10Y":"US 10Y","TVC:GOLD":"XAU／USD",
+    "TVC:USOIL":"WTI ORIGINAL","TVC:DAX":"DAX","TVC:UKX":"FTSE 100","TVC:HSI":"HANG SENG",
+    "TVC:SHCOMP":"SHANGHAI","TVC:KOSPI":"KOSPI"
+  };
+  var EX_FLAG = {
+    TSE:"\uD83C\uDDEF\uD83C\uDDF5", OSE:"\uD83C\uDDEF\uD83C\uDDF5",
+    NASDAQ:"\uD83C\uDDFA\uD83C\uDDF8", NYSE:"\uD83C\uDDFA\uD83C\uDDF8",
+    AMEX:"\uD83C\uDDFA\uD83C\uDDF8", CBOE:"\uD83C\uDDFA\uD83C\uDDF8", SP:"\uD83C\uDDFA\uD83C\uDDF8",
+    HKEX:"\uD83C\uDDED\uD83C\uDDF0", SSE:"\uD83C\uDDE8\uD83C\uDDF3", SZSE:"\uD83C\uDDE8\uD83C\uDDF3",
+    KRX:"\uD83C\uDDF0\uD83C\uDDF7", TWSE:"\uD83C\uDDF9\uD83C\uDDFC", XETR:"\uD83C\uDDE9\uD83C\uDDEA",
+    LSE:"\uD83C\uDDEC\uD83C\uDDE7", EURONEXT:"\uD83C\uDDEA\uD83C\uDDFA", ASX:"\uD83C\uDDE6\uD83C\uDDFA",
+    TSX:"\uD83C\uDDE8\uD83C\uDDE6", NSE:"\uD83C\uDDEE\uD83C\uDDF3", BSE:"\uD83C\uDDEE\uD83C\uDDF3",
+    SIX:"\uD83C\uDDE8\uD83C\uDDED", BMFBOVESPA:"\uD83C\uDDE7\uD83C\uDDF7"
+  };
+  var CCY_FLAG = {
+    USD:"\uD83C\uDDFA\uD83C\uDDF8", JPY:"\uD83C\uDDEF\uD83C\uDDF5", EUR:"\uD83C\uDDEA\uD83C\uDDFA",
+    GBP:"\uD83C\uDDEC\uD83C\uDDE7", AUD:"\uD83C\uDDE6\uD83C\uDDFA", NZD:"\uD83C\uDDF3\uD83C\uDDFF",
+    CAD:"\uD83C\uDDE8\uD83C\uDDE6", CHF:"\uD83C\uDDE8\uD83C\uDDED", CNY:"\uD83C\uDDE8\uD83C\uDDF3",
+    KRW:"\uD83C\uDDF0\uD83C\uDDF7", TRY:"\uD83C\uDDF9\uD83C\uDDF7", MXN:"\uD83C\uDDF2\uD83C\uDDFD",
+    ZAR:"\uD83C\uDDFF\uD83C\uDDE6", HKD:"\uD83C\uDDED\uD83C\uDDF0"
+  };
+  var IDX_FLAG = {
+    NI225:"\uD83C\uDDEF\uD83C\uDDF5", TPX:"\uD83C\uDDEF\uD83C\uDDF5",
+    DJI:"\uD83C\uDDFA\uD83C\uDDF8", SPX:"\uD83C\uDDFA\uD83C\uDDF8", NDX:"\uD83C\uDDFA\uD83C\uDDF8",
+    IXIC:"\uD83C\uDDFA\uD83C\uDDF8", VIX:"\uD83C\uDDFA\uD83C\uDDF8", US10Y:"\uD83C\uDDFA\uD83C\uDDF8",
+    GOLD:"\uD83E\uDD47", USOIL:"\uD83D\uDEE2", SILVER:"\uD83E\uDD48",
+    DAX:"\uD83C\uDDE9\uD83C\uDDEA", UKX:"\uD83C\uDDEC\uD83C\uDDE7",
+    HSI:"\uD83C\uDDED\uD83C\uDDF0", SHCOMP:"\uD83C\uDDE8\uD83C\uDDF3", KOSPI:"\uD83C\uDDF0\uD83C\uDDF7",
+    SX5E:"\uD83C\uDDEA\uD83C\uDDFA"
+  };
+
+  var state = { list:DEFAULTS.slice(), range:"12M", size:"md", theme:"system" };
+
+  var grid = document.getElementById("grid");
+  var empty = document.getElementById("empty");
+
+  /* ---------- storage / url ---------- */
+  function load(){
+    try{
+      var raw = localStorage.getItem(LS_KEY);
+      if(raw){
+        var s = JSON.parse(raw);
+        if(Array.isArray(s.list)) state.list = s.list.slice(0,60);
+        if(s.range) state.range = s.range;
+        if(s.size) state.size = s.size;
+        if(s.theme) state.theme = s.theme;
+      }
+    }catch(e){}
+    readHash();
+  }
+  function readHash(){
+    var h = location.hash.replace(/^#/,"");
+    if(!h) return;
+    var p = new URLSearchParams(h);
+    var s = p.get("s");
+    if(s){ state.list = s.split(",").map(function(x){return x.trim().toUpperCase();}).filter(Boolean); }
+    if(p.get("r")) state.range = p.get("r");
+    if(p.get("z")) state.size = p.get("z");
+  }
+  function save(){
+    try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){}
+  }
+  function shareUrl(){
+    var base = location.href.split("#")[0];
+    return base + "#s=" + encodeURIComponent(state.list.join(",")) + "&r=" + state.range + "&z=" + state.size;
+  }
+
+  /* ---------- symbols ---------- */
+  function normalize(raw){
+    var v = String(raw||"").trim();
+    if(!v) return "";
+    var low = v.toLowerCase();
+    if(ALIASES[low]) return ALIASES[low];
+    if(ALIASES[v]) return ALIASES[v];
+    if(/^[0-9]{4}[A-Za-z]?$/.test(v)) return "TSE:" + v.toUpperCase();
+    if(/^[0-9]{4}[A-Za-z]?\.(t|jp)$/i.test(v)) return "TSE:" + v.split(".")[0].toUpperCase();
+    if(v.indexOf(":") > -1) return v.toUpperCase();
+    return v.toUpperCase();
+  }
+  function labelOf(sym){
+    if(NAMES[sym]) return NAMES[sym];
+    var t = sym.split(":");
+    return t.length > 1 ? t[1] : sym;
+  }
+  function parts(sym){
+    var i = sym.indexOf(":");
+    return i > -1 ? { ex: sym.slice(0,i), code: sym.slice(i+1) } : { ex:"", code: sym };
+  }
+  function subOf(sym){
+    if(SUBS[sym]) return SUBS[sym];
+    var p = parts(sym);
+    if(p.ex === "TSE" || p.ex === "OSE") return "東証 " + p.code;
+    if(p.ex === "FX" || p.ex === "FX_IDC" || p.ex === "OANDA"){
+      if(/^[A-Z]{6}$/.test(p.code)) return p.code.slice(0,3) + "／" + p.code.slice(3);
+      return p.code;
+    }
+    if(/JPY$|USD$/.test(p.code) && p.code.length >= 6 && p.ex && p.ex !== "TVC"){
+      return p.code.slice(0, p.code.length-3) + "／" + p.code.slice(-3);
+    }
+    return p.ex ? p.ex + " " + p.code : p.code;
+  }
+  function flagOf(sym){
+    var p = parts(sym);
+    if(p.ex === "TVC" || p.ex === "INDEX" || p.ex === "CAPITALCOM"){
+      if(IDX_FLAG[p.code]) return IDX_FLAG[p.code];
+    }
+    if(/^(BTC|ETH|XRP|SOL|DOGE|LTC|BCH|ADA)/.test(p.code)) return "\u20BF";
+    if(p.ex === "FX" || p.ex === "FX_IDC" || p.ex === "OANDA"){
+      return CCY_FLAG[p.code.slice(0,3)] || "\uD83D\uDCB1";
+    }
+    if(EX_FLAG[p.ex]) return EX_FLAG[p.ex];
+    if(IDX_FLAG[p.code]) return IDX_FLAG[p.code];
+    if(/^[0-9]{4}/.test(p.code)) return EX_FLAG.TSE;
+    return "\uD83D\uDCC8";
+  }
+  function theme(){
+    if(state.theme === "dark") return "dark";
+    if(state.theme === "light") return "light";
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+
+  /* ---------- tradingview embeds ---------- */
+  function miniUrl(sym){
+    var cfg = {
+      symbol: sym, width:"100%", height:"100%", locale:"ja",
+      dateRange: state.range, colorTheme: theme(),
+      isTransparent: true, autosize: true, largeChartUrl: ""
+    };
+    return "https://s.tradingview.com/embed-widget/mini-symbol-overview/?locale=ja#" + encodeURIComponent(JSON.stringify(cfg));
+  }
+  function advancedUrl(sym){
+    var p = new URLSearchParams({
+      symbol: sym, interval:"15", theme: theme(), style:"1", locale:"ja",
+      timezone:"Asia/Tokyo", withdateranges:"1", allow_symbol_change:"1",
+      save_image:"0", hideideas:"1", hide_side_toolbar:"0"
+    });
+    return "https://s.tradingview.com/widgetembed/?" + p.toString();
+  }
+  function tvChartUrl(sym){
+    return "https://www.tradingview.com/chart/?symbol=" + encodeURIComponent(sym);
+  }
+
+  /* ---------- render ---------- */
+  function render(){
+    document.documentElement.style.setProperty("--card-min", SIZES[state.size] || SIZES.md);
+    document.documentElement.style.setProperty("--chart-h", CHART_H[state.size] || CHART_H.md);
+
+    grid.textContent = "";
+    empty.hidden = state.list.length > 0;
+
+    state.list.forEach(function(sym, i){
+      var card = document.createElement("div");
+      card.className = "card";
+      card.draggable = true;
+      card.dataset.index = String(i);
+
+      var head = document.createElement("div");
+      head.className = "card-head";
+
+      var flag = document.createElement("span");
+      flag.className = "flag";
+      flag.textContent = flagOf(sym);
+      flag.setAttribute("aria-hidden", "true");
+
+      var titles = document.createElement("div");
+      titles.className = "titles";
+      var nm = document.createElement("span");
+      nm.className = "nm";
+      nm.textContent = labelOf(sym);
+      var sub = document.createElement("span");
+      sub.className = "sub";
+      sub.textContent = subOf(sym);
+      sub.title = sym;
+      titles.appendChild(nm);
+      titles.appendChild(sub);
+
+      var ctl = document.createElement("div");
+      ctl.className = "ctl";
+      ctl.appendChild(iconBtn("\u25C0", "左へ移動", function(){ move(i, -1); }));
+      ctl.appendChild(iconBtn("\u25B6", "右へ移動", function(){ move(i, 1); }));
+      ctl.appendChild(iconBtn("\u2715", "削除", function(){ remove(i); }, "del"));
+
+      head.appendChild(flag);
+      head.appendChild(titles);
+      head.appendChild(ctl);
+
+      var chart = document.createElement("div");
+      chart.className = "chart";
+
+      var frame = document.createElement("iframe");
+      frame.src = miniUrl(sym);
+      frame.loading = "lazy";
+      frame.title = labelOf(sym) + " のチャート";
+      frame.setAttribute("scrolling", "no");
+      frame.setAttribute("frameborder", "0");
+
+      var fb = document.createElement("div");
+      fb.className = "fallback";
+      fb.innerHTML = '<div>チャートを読み込めませんでした</div>';
+      var link = document.createElement("a");
+      link.href = tvChartUrl(sym);
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.textContent = "TradingViewで表示";
+      fb.appendChild(link);
+
+      var failTimer = setTimeout(function(){ chart.dataset.failed = "1"; }, 9000);
+      frame.addEventListener("load", function(){ clearTimeout(failTimer); });
+
+      var hit = document.createElement("button");
+      hit.type = "button";
+      hit.className = "hit";
+      hit.setAttribute("aria-label", labelOf(sym) + " の詳細チャートを開く");
+      hit.title = "タップで詳細チャート";
+      hit.addEventListener("click", function(){ openDetail(sym); });
+
+      chart.appendChild(frame);
+      chart.appendChild(hit);
+      chart.appendChild(fb);
+      card.appendChild(head);
+      card.appendChild(chart);
+      wireDrag(card);
+      grid.appendChild(card);
+    });
+  }
+
+  function iconBtn(glyph, label, fn, extra){
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "ico" + (extra ? " " + extra : "");
+    b.textContent = glyph;
+    b.title = label;
+    b.setAttribute("aria-label", label);
+    b.addEventListener("click", fn);
+    return b;
+  }
+
+  /* ---------- list ops ---------- */
+  function add(raw){
+    var sym = normalize(raw);
+    if(!sym) return;
+    if(state.list.indexOf(sym) > -1){
+      var el = grid.children[state.list.indexOf(sym)];
+      if(el) el.scrollIntoView({behavior:"smooth", block:"center"});
+      return;
+    }
+    state.list.unshift(sym);
+    save(); render();
+  }
+  function remove(i){ state.list.splice(i,1); save(); render(); }
+  function move(i, d){
+    var j = i + d;
+    if(j < 0 || j >= state.list.length) return;
+    var t = state.list[i]; state.list[i] = state.list[j]; state.list[j] = t;
+    save(); render();
+  }
+  function reorder(from, to){
+    if(from === to) return;
+    var item = state.list.splice(from,1)[0];
+    state.list.splice(to, 0, item);
+    save(); render();
+  }
+
+  var dragFrom = null;
+  function wireDrag(card){
+    card.addEventListener("dragstart", function(e){
+      dragFrom = Number(card.dataset.index);
+      card.classList.add("dragging");
+      try{ e.dataTransfer.setData("text/plain", String(dragFrom)); e.dataTransfer.effectAllowed = "move"; }catch(err){}
+    });
+    card.addEventListener("dragend", function(){ card.classList.remove("dragging"); dragFrom = null; });
+    card.addEventListener("dragover", function(e){ e.preventDefault(); card.classList.add("over"); });
+    card.addEventListener("dragleave", function(){ card.classList.remove("over"); });
+    card.addEventListener("drop", function(e){
+      e.preventDefault(); card.classList.remove("over");
+      var to = Number(card.dataset.index);
+      if(dragFrom !== null && !isNaN(to)) reorder(dragFrom, to);
+    });
+  }
+
+  /* ---------- detail dialog ---------- */
+  var dlg = document.getElementById("detail");
+  var dlgBody = document.getElementById("dlg-body");
+  function openDetail(sym){
+    document.getElementById("dlg-sym").textContent = sym;
+    document.getElementById("dlg-name").textContent = labelOf(sym);
+    document.getElementById("dlg-tv").href = tvChartUrl(sym);
+    dlgBody.textContent = "";
+    var f = document.createElement("iframe");
+    f.src = advancedUrl(sym);
+    f.title = labelOf(sym) + " の詳細チャート";
+    f.setAttribute("frameborder","0");
+    dlgBody.appendChild(f);
+    if(typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open","");
+  }
+  document.getElementById("dlg-close").addEventListener("click", function(){ dlg.close(); });
+  dlg.addEventListener("close", function(){ dlgBody.textContent = ""; });
+
+  /* ---------- controls ---------- */
+  document.getElementById("add-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    var input = document.getElementById("sym-input");
+    add(input.value);
+    input.value = "";
+    input.focus();
+  });
+
+  var seg = document.getElementById("range-seg");
+  function paintSeg(){
+    Array.prototype.forEach.call(seg.querySelectorAll("button"), function(b){
+      b.setAttribute("aria-pressed", String(b.dataset.range === state.range));
+    });
+  }
+  seg.addEventListener("click", function(e){
+    var b = e.target.closest("button[data-range]");
+    if(!b) return;
+    state.range = b.dataset.range; paintSeg(); save(); render();
+  });
+
+  var sizeSel = document.getElementById("size-sel");
+  sizeSel.addEventListener("change", function(){ state.size = sizeSel.value; save(); render(); });
+
+  var themeSel = document.getElementById("theme-sel");
+  themeSel.addEventListener("change", function(){
+    state.theme = themeSel.value; applyTheme(); save(); render();
+  });
+  function applyTheme(){
+    if(state.theme === "system") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", state.theme);
+  }
+  if(window.matchMedia){
+    var mq = window.matchMedia("(prefers-color-scheme: dark)");
+    var onMq = function(){ if(state.theme === "system") render(); };
+    if(mq.addEventListener) mq.addEventListener("change", onMq); else if(mq.addListener) mq.addListener(onMq);
+  }
+
+  var editBtn = document.getElementById("edit-btn");
+  editBtn.addEventListener("click", function(){
+    var on = !document.body.classList.contains("editing");
+    document.body.classList.toggle("editing", on);
+    editBtn.setAttribute("aria-pressed", String(on));
+    editBtn.textContent = on ? "編集を終える" : "編集";
+  });
+
+  document.getElementById("share-btn").addEventListener("click", function(){
+    var url = shareUrl();
+    history.replaceState(null, "", url);
+    var btn = this, done = function(ok){
+      btn.textContent = ok ? "コピーしました" : "URLをアドレス欄に反映";
+      setTimeout(function(){ btn.textContent = "共有URLをコピー"; }, 1800);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(function(){ done(true); }, function(){ done(false); });
+    } else { done(false); }
+  });
+
+  document.getElementById("reset-btn").addEventListener("click", function(){
+    if(!confirm("登録銘柄を初期状態に戻しますか？")) return;
+    state.list = DEFAULTS.slice();
+    history.replaceState(null, "", location.href.split("#")[0]);
+    save(); render();
+  });
+
+  window.addEventListener("hashchange", function(){ readHash(); paintSeg(); syncControls(); save(); render(); });
+
+  var chips = document.getElementById("empty-chips");
+  ["7203","6758","8035","9432","AAPL","NVDA","日経","ドル円","ビットコイン"].forEach(function(s){
+    var c = document.createElement("button");
+    c.type = "button"; c.className = "chip"; c.textContent = s;
+    c.addEventListener("click", function(){ add(s); });
+    chips.appendChild(c);
+  });
+
+  /* ---------- market clocks ---------- */
+  function zoneNow(tz){
+    var f = new Intl.DateTimeFormat("en-US", {
+      timeZone: tz, hour12:false, weekday:"short",
+      hour:"2-digit", minute:"2-digit"
+    });
+    var parts = {}, arr = f.formatToParts(new Date());
+    for(var i=0;i<arr.length;i++) parts[arr[i].type] = arr[i].value;
+    var h = parseInt(parts.hour, 10) % 24;
+    var m = parseInt(parts.minute, 10);
+    return { hm: (h<10?"0":"") + h + ":" + (m<10?"0":"") + m, mins: h*60+m, wd: parts.weekday };
+  }
+  function tick(){
+    var tk = zoneNow("Asia/Tokyo"), ny = zoneNow("America/New_York");
+    var wknd = function(w){ return w === "Sat" || w === "Sun"; };
+
+    var tkState = "休場", tkCls = "";
+    if(!wknd(tk.wd)){
+      if(tk.mins >= 540 && tk.mins < 690){ tkState = "前場"; tkCls = "open"; }
+      else if(tk.mins >= 690 && tk.mins < 750){ tkState = "昼休み"; tkCls = "break"; }
+      else if(tk.mins >= 750 && tk.mins < 930){ tkState = "後場"; tkCls = "open"; }
+      else if(tk.mins < 540){ tkState = "寄り付き前"; }
+      else { tkState = "引け後"; }
+    }
+    var nyState = "休場", nyCls = "";
+    if(!wknd(ny.wd)){
+      if(ny.mins >= 570 && ny.mins < 960){ nyState = "取引中"; nyCls = "open"; }
+      else if(ny.mins >= 240 && ny.mins < 570){ nyState = "プレ"; nyCls = "break"; }
+      else if(ny.mins >= 960 && ny.mins < 1200){ nyState = "アフター"; nyCls = "break"; }
+      else { nyState = "閉場"; }
+    }
+    document.getElementById("tk-time").textContent = tk.hm;
+    document.getElementById("tk-state").textContent = tkState;
+    document.getElementById("tk-dot").className = "dot " + tkCls;
+    document.getElementById("ny-time").textContent = ny.hm;
+    document.getElementById("ny-state").textContent = nyState;
+    document.getElementById("ny-dot").className = "dot " + nyCls;
+  }
+
+  function syncControls(){
+    sizeSel.value = state.size;
+    themeSel.value = state.theme;
+  }
+
+  /* ---------- boot ---------- */
+  load();
+  applyTheme();
+  syncControls();
+  paintSeg();
+  render();
+  tick();
+  setInterval(tick, 15000);
+})();
+</script>
+</body>
+</html>
