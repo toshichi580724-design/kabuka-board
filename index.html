@@ -262,7 +262,7 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
     <span class="legend"><span class="swatch" style="background:var(--down)"></span>下落</span>
     <span>大きな騰落率は<b>選択中の表示期間</b>の変化率です（1日＝前日終値比）。点線はその基準値、右の目盛りは期間中の高値・安値と現在値。</span>
   </div>
-  <div>株価データは Yahoo Finance の公開チャートAPIから取得（直接取得できない場合は公開中継サーバ経由）。日本株は20分程度の遅延があります。投資判断には証券会社の正式な値をご確認ください。市場ステータスは通常取引時間からの推定で、祝日は考慮していません。登録銘柄はこのブラウザに保存され、共有URLにも含まれます。</div>
+  <div>株価データは Yahoo Finance の公開チャートAPIから取得（ブラウザから直接取得できないため r.jina.ai の読み取り経由。暗号資産は CoinGecko を予備経路として使用）。日本株は20分程度の遅延があります。投資判断には証券会社の正式な値をご確認ください。市場ステータスは通常取引時間からの推定で、祝日は考慮していません。登録銘柄はこのブラウザに保存され、共有URLにも含まれます。</div>
 </footer>
 
 <dialog id="detail">
@@ -430,23 +430,59 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
            "?range=" + r.range + "&interval=" + r.interval + "&includePrePost=false";
   }
   var TRANSPORTS = [
+    { name:"jina経由", wrap:function(u){ return "https://r.jina.ai/" + u; } },
     { name:"直接", wrap:function(u){ return u; } },
     { name:"中継A", wrap:function(u){ return "https://api.allorigins.win/raw?url=" + encodeURIComponent(u); } },
-    { name:"中継B", wrap:function(u){ return "https://api.codetabs.com/v1/proxy/?quest=" + encodeURIComponent(u); } },
-    { name:"中継C", wrap:function(u){ return "https://corsproxy.io/?url=" + encodeURIComponent(u); } }
+    { name:"中継B", wrap:function(u){ return "https://api.codetabs.com/v1/proxy/?quest=" + encodeURIComponent(u); } }
   ];
+  function extractJson(text){
+    if(!text) throw new Error("空の応答");
+    var i = text.indexOf("{"), j = text.lastIndexOf("}");
+    if(i < 0 || j <= i) throw new Error("データが取り出せません");
+    var body = text.slice(i, j+1);
+    try{ return JSON.parse(body); }
+    catch(e){
+      try{ return JSON.parse(body.replace(/\\([_*\[\]()#+\-.!`>~|])/g, "$1")); }
+      catch(e2){ throw new Error("データ形式が不正"); }
+    }
+  }
   function fetchOne(url, t){
     var ac = new AbortController();
-    var timer = setTimeout(function(){ ac.abort(); }, 9000);
+    var timer = setTimeout(function(){ ac.abort(); }, 14000);
     return fetch(t.wrap(url), { signal:ac.signal, cache:"no-store", referrerPolicy:"no-referrer" })
-      .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-      .then(function(j){
-        if(!j || !j.chart) throw new Error("データ形式が不正");
+      .then(function(r){
+        if(!r.ok) throw new Error(r.status === 429 ? "混雑（429）" : "HTTP " + r.status);
+        return r.text();
+      })
+      .then(function(txt){
+        var j = extractJson(txt);
+        if(!j.chart) throw new Error("データ形式が不正");
         if(j.chart.error) throw new Error(j.chart.error.description || "銘柄が見つかりません");
         clearTimeout(timer); return j;
       }, function(e){ clearTimeout(timer); throw e; });
   }
-  function fetchChart(sym, rk){
+  var CRYPTO = {
+    "BTC-JPY":{ id:"bitcoin", vs:"jpy" }, "BTC-USD":{ id:"bitcoin", vs:"usd" },
+    "ETH-JPY":{ id:"ethereum", vs:"jpy" }, "ETH-USD":{ id:"ethereum", vs:"usd" },
+    "XRP-JPY":{ id:"ripple", vs:"jpy" }, "SOL-JPY":{ id:"solana", vs:"jpy" }
+  };
+  function fetchCoinGecko(sym, rk){
+    var c = CRYPTO[sym];
+    var days = { "1d":1, "5d":5, "1mo":30, "3mo":90, "1y":365, "5y":1825 }[rk] || 1;
+    var u = "https://api.coingecko.com/api/v3/coins/" + c.id + "/market_chart?vs_currency=" + c.vs + "&days=" + days;
+    return fetch(u, { cache:"no-store" })
+      .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function(j){
+        var pr = j.prices || [];
+        if(!pr.length) throw new Error("データなし");
+        var series = pr.map(function(p){ return { t:Math.floor(p[0]/1000), v:p[1] }; });
+        srcEl.textContent = "取得経路: CoinGecko";
+        return { price:series[series.length-1].v, prev:series[0].v, series:series,
+                 meta:{ currency:c.vs.toUpperCase(), fullExchangeName:"COINGECKO", priceHint:0 },
+                 hi:null, lo:null, vol:null, time:series[series.length-1].t };
+      });
+  }
+  function fetchYahoo(sym, rk){
     var url = yahooUrl(sym, rk);
     var order = transports ? [transports].concat(TRANSPORTS.filter(function(t){ return t !== transports; })) : TRANSPORTS.slice();
     var i = 0, lastErr = null;
@@ -458,6 +494,12 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
       }, function(e){ lastErr = e; return attempt(); });
     }
     return attempt();
+  }
+  function getData(sym, rk){
+    return fetchYahoo(sym, rk).then(parseChart).catch(function(e){
+      if(CRYPTO[sym]) return fetchCoinGecko(sym, rk);
+      throw e;
+    });
   }
   function parseChart(j){
     var res = j.chart.result && j.chart.result[0];
@@ -498,7 +540,7 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
     var pending = state.list.slice(), done = 0;
     pending.forEach(function(sym, idx){
       setTimeout(function(){
-        var p = MOCK ? Promise.resolve(mockData(sym, state.range)) : fetchChart(sym, state.range).then(parseChart);
+        var p = MOCK ? Promise.resolve(mockData(sym, state.range)) : getData(sym, state.range);
         p.then(function(d){ cache[sym] = d; }, function(e){
           var old = cache[sym];
           cache[sym] = { err:(e && e.message) || "取得失敗", price: old && old.price, prev: old && old.prev,
@@ -508,7 +550,7 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
           if(done === pending.length){ lastUpdate = Date.now(); render(); stamp(); }
           else if(done % 3 === 0) render();
         });
-      }, idx * 140);
+      }, idx * 220);
     });
   }
   function stamp(){
@@ -681,7 +723,7 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
     var sym = normalize(raw);
     if(!sym || state.list.indexOf(sym) > -1) return;
     state.list.unshift(sym); save(); render();
-    var p = MOCK ? Promise.resolve(mockData(sym, state.range)) : fetchChart(sym, state.range).then(parseChart);
+    var p = MOCK ? Promise.resolve(mockData(sym, state.range)) : getData(sym, state.range);
     p.then(function(d){ cache[sym] = d; }, function(e){ cache[sym] = { err:(e && e.message) || "取得失敗" }; })
      .then(function(){ lastUpdate = Date.now(); render(); stamp(); });
   }
@@ -724,7 +766,7 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
     var sym = dlgSym;
     var box = document.getElementById("dlg-chart");
     box.innerHTML = '<div class="tile-err">読み込み中…</div>';
-    var p = MOCK ? Promise.resolve(mockData(sym, dlgRange)) : fetchChart(sym, dlgRange).then(parseChart);
+    var p = MOCK ? Promise.resolve(mockData(sym, dlgRange)) : getData(sym, dlgRange);
     p.then(function(d){ if(dlgSym === sym) drawDetail(d); },
            function(e){ if(dlgSym === sym) box.innerHTML = '<div class="tile-err"><b>取得できませんでした</b>' + esc(String(e && e.message)) + '</div>'; });
   }
@@ -858,7 +900,7 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
   load(); applyTheme(); themeSel.value = state.theme; paintSeg(); render(); tick();
   setInterval(tick, 20000);
   refresh();
-  setInterval(function(){ if(document.visibilityState === "visible") refresh(); }, 60000);
+  setInterval(function(){ if(document.visibilityState === "visible") refresh(); }, state.range === "1d" ? 90000 : 300000);
   document.addEventListener("visibilitychange", function(){
     if(document.visibilityState === "visible" && Date.now() - lastUpdate > 60000) refresh();
   });
