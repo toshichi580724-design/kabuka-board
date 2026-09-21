@@ -11,54 +11,54 @@
 :root{
   --bg:#EEF1F6; --surface:#FFFFFF; --surface-2:#E8ECF3; --surface-3:#F5F7FA;
   --line:#D5DBE5; --line-2:#E4E9F0; --line-strong:#97A3B4;
-  --ink:#0E131A; --ink-2:#333E4C; --muted:#5E6A7A;
+  --ink:#0E131A; --muted:#5E6A7A;
   --accent:#12666F; --accent-ink:#FFFFFF;
   --up:#0F8A45; --down:#CE2B25; --flat:#6A7686;
   --up-soft:rgba(15,138,69,.10); --down-soft:rgba(206,43,37,.09);
-  --up-line:rgba(15,138,69,.22); --down-line:rgba(206,43,37,.20);
+  --up-line:rgba(15,138,69,.24); --down-line:rgba(206,43,37,.22);
   --shadow:0 1px 1px rgba(14,19,26,.05), 0 10px 24px -16px rgba(14,19,26,.45);
-  --card-min:244px; --chart-h:76px; --gutter:52px;
+  --card-min:222px; --chart-h:74px; --gutter:52px;
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     --bg:#080B10; --surface:#12181F; --surface-2:#1B222C; --surface-3:#171E26;
-    --line:#28313D; --line-2:#212a35; --line-strong:#4D5B6D;
-    --ink:#EAEFF6; --ink-2:#C2CBD8; --muted:#8996A8;
+    --line:#28313D; --line-2:#212A35; --line-strong:#4D5B6D;
+    --ink:#EAEFF6; --muted:#8996A8;
     --accent:#2FA3AD; --accent-ink:#04171A;
     --up:#35CE74; --down:#FF6159; --flat:#8996A8;
     --up-soft:rgba(53,206,116,.13); --down-soft:rgba(255,97,89,.12);
-    --up-line:rgba(53,206,116,.26); --down-line:rgba(255,97,89,.24);
+    --up-line:rgba(53,206,116,.28); --down-line:rgba(255,97,89,.26);
     --shadow:0 1px 1px rgba(0,0,0,.6), 0 12px 28px -18px rgba(0,0,0,.9);
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --bg:#080B10; --surface:#12181F; --surface-2:#1B222C; --surface-3:#171E26;
-  --line:#28313D; --line-2:#212a35; --line-strong:#4D5B6D;
-  --ink:#EAEFF6; --ink-2:#C2CBD8; --muted:#8996A8;
+  --line:#28313D; --line-2:#212A35; --line-strong:#4D5B6D;
+  --ink:#EAEFF6; --muted:#8996A8;
   --accent:#2FA3AD; --accent-ink:#04171A;
   --up:#35CE74; --down:#FF6159; --flat:#8996A8;
   --up-soft:rgba(53,206,116,.13); --down-soft:rgba(255,97,89,.12);
-  --up-line:rgba(53,206,116,.26); --down-line:rgba(255,97,89,.24);
+  --up-line:rgba(53,206,116,.28); --down-line:rgba(255,97,89,.26);
   --shadow:0 1px 1px rgba(0,0,0,.6), 0 12px 28px -18px rgba(0,0,0,.9);
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{margin:0;padding:0}
-body{
-  background:var(--bg); color:var(--ink);
+body{background:var(--bg);color:var(--ink);
   font-family:"Zen Kaku Gothic New",system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
-  font-size:14px; line-height:1.55; -webkit-font-smoothing:antialiased;
-}
+  font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
 .mono{font-family:"Roboto Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
 button{font:inherit;color:inherit}
 a{color:var(--accent)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:5px}
+.inner{max-width:1560px;margin:0 auto;padding-inline:14px}
 
-/* header */
-.site{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);border-bottom:1px solid var(--line-2)}
-.site-in{max-width:1500px;margin:0 auto;padding-inline:14px;padding-block:9px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+/* header + tabs */
+.site{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);border-bottom:1px solid var(--line)}
+.site-in{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:8px}
 .brand{display:flex;align-items:baseline;gap:9px;margin-right:auto}
 .brand h1{font-size:16px;font-weight:900;letter-spacing:.03em;margin:0}
 .brand .tag{font-size:9.5px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
@@ -67,124 +67,153 @@ a{color:var(--accent)}
 .clock b{font-weight:500;font-size:11.5px}
 .clock .city{color:var(--muted);letter-spacing:.06em}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--flat);flex:none}
-.dot.open{background:var(--up)}
-.dot.break{background:#D0932A}
+.dot.open{background:var(--up)} .dot.break{background:#D0932A}
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:0;background:transparent;padding:9px 14px 8px;cursor:pointer;font-size:13.5px;font-weight:700;color:var(--muted);
+  border-bottom:2.5px solid transparent;white-space:nowrap;transition:color .12s,border-color .12s}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.tab .cnt{font-size:10px;font-weight:500;color:var(--muted);margin-left:5px;font-family:"Roboto Mono",monospace}
 
 /* toolbar */
-.toolbar{max-width:1500px;margin:0 auto;padding-inline:14px;padding-block:12px 6px;display:flex;gap:9px;align-items:flex-end;flex-wrap:wrap}
+.toolbar{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;padding-block:11px 6px}
 .field{display:flex;flex-direction:column;gap:4px}
 .field label{font-size:9.5px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
 .add{display:flex;gap:6px}
 .add .btn{flex:none;white-space:nowrap}
 input[type=text],select{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font:inherit;font-size:13px;min-height:36px}
-input[type=text]{width:min(216px,48vw)}
-.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 12px;min-height:36px;cursor:pointer;font-size:12.5px;white-space:nowrap;transition:background .15s,border-color .15s,color .15s}
+input[type=text]{width:min(210px,46vw)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 12px;min-height:36px;cursor:pointer;font-size:12.5px;white-space:nowrap;transition:background .15s,border-color .15s}
 .btn:hover{background:var(--surface-2)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:500}
 .btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:500}
 .spacer{flex:1 1 auto}
 .seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.seg button{border:0;background:transparent;padding:7px 11px;cursor:pointer;font-size:12.5px;color:var(--muted);min-height:36px;transition:background .12s,color .12s}
+.seg button{border:0;background:transparent;padding:7px 11px;cursor:pointer;font-size:12.5px;color:var(--muted);min-height:36px}
 .seg button:hover{background:var(--surface-2);color:var(--ink)}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:500}
-.status{max-width:1500px;margin:0 auto;padding:2px 14px 8px;font-size:11px;color:var(--muted);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.status{padding-block:2px 8px;font-size:11px;color:var(--muted);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .status .warn{color:var(--down)}
 
 /* grid */
-.wrap{max-width:1500px;margin:0 auto;padding-inline:14px;padding-block:2px 44px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--card-min),1fr));gap:10px}
-.card{
-  background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);
+main{padding-bottom:44px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--card-min),1fr));gap:9px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:11px;box-shadow:var(--shadow);
   overflow:hidden;display:flex;flex-direction:column;position:relative;text-align:left;padding:0;cursor:pointer;
-  transition:border-color .16s, transform .16s, box-shadow .16s;
-}
+  transition:border-color .16s,transform .16s}
 .card:hover{border-color:var(--line-strong);transform:translateY(-1px)}
+.card:hover .zoom{opacity:1}
 .card.dragging{opacity:.35}
-.card.over{border-color:var(--accent);border-style:solid}
-.card-head{display:flex;align-items:center;gap:8px;padding:8px 10px 6px}
-.flag{font-size:14px;line-height:1;flex:none;width:24px;height:24px;display:grid;place-items:center;border-radius:6px;background:var(--surface-2);font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.card.over{border-color:var(--accent)}
+.card-head{display:flex;align-items:center;gap:7px;padding:7px 9px 5px}
+.flag{font-size:13.5px;line-height:1;flex:none;width:23px;height:23px;display:grid;place-items:center;border-radius:6px;background:var(--surface-2);
+  font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
 .titles{display:flex;flex-direction:column;min-width:0;flex:1 1 auto}
-.nm{font-size:13px;font-weight:700;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nm{font-size:12.5px;font-weight:700;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sub{font-family:"Roboto Mono",monospace;font-size:9px;letter-spacing:.04em;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.price{padding:0 10px 2px;display:flex;align-items:baseline;min-height:32px}
-.price .int{font-size:25px;font-weight:700;line-height:1.08;letter-spacing:-.025em}
-.price .dec{font-size:15px;font-weight:700;line-height:1.08}
+.zoom{flex:none;font-size:10px;color:var(--muted);opacity:0;transition:opacity .15s}
+.price{padding:0 9px 2px;display:flex;align-items:baseline;min-height:31px}
+.price .int{font-size:24px;font-weight:700;line-height:1.08;letter-spacing:-.025em}
+.price .dec{font-size:14.5px;font-weight:700;line-height:1.08}
 .price .cur{font-size:9.5px;color:var(--muted);margin-left:6px;letter-spacing:.06em}
 .price.loading{color:var(--muted);font-size:12px;font-weight:400;align-items:center}
-
-.chartbox{position:relative;height:var(--chart-h);padding-right:var(--gutter);margin-top:1px}
+.chartbox{position:relative;height:var(--chart-h);padding-right:var(--gutter)}
 .chartbox svg{display:block;width:100%;height:100%}
 .gut{position:absolute;top:0;right:0;bottom:0;width:var(--gutter);pointer-events:none}
 .pill{position:absolute;right:4px;font-family:"Roboto Mono",monospace;font-size:8.5px;font-weight:500;line-height:1;
-  padding:2px 4px;border-radius:3px;white-space:nowrap;letter-spacing:-.01em}
+  padding:2px 4px;border-radius:3px;white-space:nowrap}
 .pill.hi{top:2px;color:var(--muted);background:var(--surface-2)}
 .pill.lo{bottom:2px;color:var(--muted);background:var(--surface-2)}
-.pill.now{transform:translateY(-50%);font-weight:700;font-size:9px;color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.pill.ax{color:var(--muted);background:transparent;transform:translateY(-50%)}
+.pill.now{transform:translateY(-50%);font-weight:700;font-size:9px;color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25)}
 .pill.now.up{background:var(--up)} .pill.now.down{background:var(--down)} .pill.now.flat{background:var(--flat)}
-
-.foot{display:flex;align-items:baseline;gap:8px;padding:6px 10px 8px;border-top:1px solid var(--line-2)}
+.foot{display:flex;align-items:baseline;gap:8px;padding:5px 9px 7px;border-top:1px solid var(--line-2)}
 .foot.up{background:var(--up-soft)} .foot.down{background:var(--down-soft)}
-.pct{font-size:20px;font-weight:900;line-height:1.05;letter-spacing:-.02em}
-.pct .u{font-size:13px;font-weight:700;margin-left:1px}
-.diff{font-size:11.5px;font-weight:700}
+.pct{font-size:19px;font-weight:900;line-height:1.05;letter-spacing:-.02em}
+.pct .u{font-size:12.5px;font-weight:700;margin-left:1px}
+.diff{font-size:11px;font-weight:700}
 .per{margin-left:auto;font-size:9px;letter-spacing:.1em;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:1px 5px;background:var(--surface);white-space:nowrap}
-.day{font-size:10px;color:var(--muted);padding:0 10px 8px;margin-top:-4px}
+.day{font-size:10px;color:var(--muted);padding:0 9px 7px;margin-top:-3px}
 .day b{font-weight:700}
 .up{color:var(--up)} .down{color:var(--down)} .flat{color:var(--flat)}
-.tile-err{padding:10px 10px 14px;font-size:11.5px;color:var(--muted);line-height:1.6}
+.tile-err{padding:10px 9px 13px;font-size:11.5px;color:var(--muted);line-height:1.6}
 .tile-err b{color:var(--down);font-weight:700;display:block}
-.skeleton{height:var(--chart-h);background:linear-gradient(90deg,var(--surface-2),var(--surface-3),var(--surface-2));opacity:.7}
-
+.skeleton{height:var(--chart-h);background:var(--surface-3)}
 .ctl{position:absolute;top:6px;right:6px;display:none;gap:2px;background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:2px;box-shadow:var(--shadow)}
 body.editing .ctl{display:flex}
 body.editing .card{border-style:dashed}
-.ico{border:0;background:transparent;color:var(--muted);cursor:pointer;width:26px;height:26px;border-radius:5px;display:grid;place-items:center;font-size:11px;line-height:1}
+.ico{border:0;background:transparent;color:var(--muted);cursor:pointer;width:25px;height:25px;border-radius:5px;display:grid;place-items:center;font-size:11px}
 .ico:hover{background:var(--surface-2);color:var(--ink)}
 .ico.del:hover{color:var(--down)}
-
-.empty{border:1px dashed var(--line);border-radius:12px;padding:26px 16px;text-align:center;color:var(--muted)}
+.empty{border:1px dashed var(--line);border-radius:11px;padding:24px 16px;text-align:center;color:var(--muted)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:12px}
 .chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:12px;cursor:pointer}
 .chip:hover{border-color:var(--accent);color:var(--accent)}
-footer{max-width:1500px;margin:0 auto;padding:0 14px 36px;color:var(--muted);font-size:11px;line-height:1.85}
+
+/* news */
+.news{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:9px}
+.nitem{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 13px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:5px;text-decoration:none;color:inherit;transition:border-color .15s}
+.nitem:hover{border-color:var(--line-strong)}
+.nitem .t{font-size:13px;font-weight:700;line-height:1.5}
+.nitem .m{font-size:10.5px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;font-family:"Roboto Mono",monospace}
+.nnote{color:var(--muted);font-size:11.5px;margin:0}
+.news-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-block:11px 9px}
+.ncat{font-size:9.5px;font-weight:700;border-radius:4px;padding:1px 6px;background:var(--surface-2);color:var(--muted)}
+.nsrc{margin-top:18px;padding-top:12px;border-top:1px solid var(--line-2);display:flex;flex-wrap:wrap;gap:6px}
+.nsrc .lab{font-size:9.5px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;width:100%;margin-bottom:3px}
+.nsrc a{font-size:11.5px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 11px;text-decoration:none;color:var(--ink);transition:border-color .15s,color .15s}
+.nsrc a:hover{border-color:var(--accent);color:var(--accent)}
+
+footer{color:var(--muted);font-size:11px;line-height:1.85;padding-bottom:36px}
 footer .rule{height:1px;background:var(--line-2);margin-bottom:12px}
 .legend{display:inline-flex;align-items:center;gap:5px;margin-right:12px}
 .swatch{width:9px;height:9px;border-radius:2px;display:inline-block}
 
-dialog{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);padding:0;width:min(880px,94vw);max-width:94vw;box-shadow:0 30px 80px rgba(0,0,0,.45)}
+/* detail dialog */
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);padding:0;width:min(920px,95vw);max-width:95vw;box-shadow:0 30px 80px rgba(0,0,0,.45)}
 dialog::backdrop{background:rgba(5,8,13,.66)}
 .dlg-head{display:flex;align-items:center;gap:10px;padding:12px 13px;border-bottom:1px solid var(--line-2)}
-.dlg-head .flag{width:30px;height:30px;font-size:17px}
+.dlg-head .flag{width:30px;height:30px;font-size:16px}
 .dlg-head h2{font-size:15.5px;margin:0;font-weight:700;line-height:1.3}
 .dlg-sub{font-family:"Roboto Mono",monospace;font-size:10px;color:var(--muted)}
 .dlg-body{padding:12px 14px 16px}
 .dlg-price{display:flex;align-items:baseline;flex-wrap:wrap;margin-bottom:10px}
-.dlg-price .int{font-size:32px;font-weight:700;letter-spacing:-.025em}
+.dlg-price .int{font-size:31px;font-weight:700;letter-spacing:-.025em}
 .dlg-price .dec{font-size:19px;font-weight:700}
 .dlg-price .cur{font-size:10px;color:var(--muted);margin-left:7px}
-.dlg-price .pct{margin-left:16px;font-size:22px}
+.dlg-price .pct{margin-left:16px;font-size:21px}
 .dlg-price .diff{margin-left:9px;font-size:13px}
-.dlg-chart{position:relative;height:min(320px,42vh);border:1px solid var(--line-2);border-radius:10px;overflow:hidden;background:var(--surface-3);padding-right:60px}
-.dlg-chart .pill{font-size:10px}
+.dlg-chart{position:relative;height:min(330px,44vh);border:1px solid var(--line-2);border-radius:10px;overflow:hidden;
+  background:var(--surface-3);padding-right:62px;padding-bottom:19px}
+.dlg-chart .pill{font-size:9.5px;right:5px}
+.dlg-chart .gut{width:62px;bottom:19px}
+.xaxis{position:absolute;left:0;right:62px;bottom:0;height:19px;border-top:1px solid var(--line-2);
+  font-family:"Roboto Mono",monospace;font-size:9px;color:var(--muted)}
+.xaxis span{position:absolute;top:3px;transform:translateX(-50%);white-space:nowrap}
+.xaxis span:first-child{transform:none;left:3px!important}
+.xaxis span:last-child{transform:translateX(-100%)}
 .dlg-ranges{margin:10px 0 0;flex-wrap:wrap}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(108px,1fr));gap:8px;margin-top:12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(106px,1fr));gap:8px;margin-top:12px}
 .stat{background:var(--surface-2);border-radius:8px;padding:8px 10px}
 .stat .k{font-size:9px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
 .stat .v{font-family:"Roboto Mono",monospace;font-size:13.5px;font-weight:500;font-variant-numeric:tabular-nums;margin-top:1px}
 
 @media (max-width:560px){
-  :root{--gutter:44px}
-  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-  .wrap,.toolbar,.site-in,.status,footer{padding-inline:10px}
-  .nm{font-size:12px}
-  .price .int{font-size:22px}
-  .price .dec{font-size:13.5px}
-  .pct{font-size:18px}
-  .brand h1{font-size:15px}
+  :root{--gutter:44px;--card-min:0}
+  .inner{padding-inline:10px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .news{grid-template-columns:1fr}
+  .nm{font-size:11.5px}
+  .price .int{font-size:21px}
+  .price .dec{font-size:13px}
+  .pct{font-size:17px}
   .add{width:100%}
   .add input{flex:1 1 auto;width:auto}
   .field.add-field{flex:1 1 100%}
   .per{display:none}
+  .tab{padding:9px 11px 8px;font-size:13px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -192,81 +221,88 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
 <body>
 
 <header class="site">
-  <div class="site-in">
+  <div class="inner site-in">
     <div class="brand"><h1>マイ株価ボード</h1><span class="tag">watchlist</span></div>
     <div class="clocks">
       <div class="clock"><span class="dot" id="tk-dot"></span><span class="city">東京</span><b class="mono" id="tk-time">--:--</b><span class="state" id="tk-state">—</span></div>
       <div class="clock"><span class="dot" id="ny-dot"></span><span class="city">NY</span><b class="mono" id="ny-time">--:--</b><span class="state" id="ny-state">—</span></div>
     </div>
   </div>
+  <div class="inner"><div class="tabs" id="tabs" role="tablist"></div></div>
 </header>
 
-<div class="toolbar">
-  <div class="field add-field">
-    <label for="sym-input">銘柄を登録</label>
-    <form class="add" id="add-form">
-      <input type="text" id="sym-input" list="popular" placeholder="7203 / AAPL / ドル円" autocomplete="off" spellcheck="false">
-      <button class="btn primary" type="submit">追加</button>
-    </form>
-    <datalist id="popular">
-      <option value="7203" label="トヨタ自動車"></option>
-      <option value="6758" label="ソニーグループ"></option>
-      <option value="8035" label="東京エレクトロン"></option>
-      <option value="9432" label="NTT"></option>
-      <option value="6861" label="キーエンス"></option>
-      <option value="9984" label="ソフトバンクG"></option>
-      <option value="AAPL" label="アップル"></option>
-      <option value="NVDA" label="エヌビディア"></option>
-      <option value="日経" label="日経平均"></option>
-      <option value="ダウ" label="NYダウ"></option>
-      <option value="ドル円" label="USD/JPY"></option>
-      <option value="ビットコイン" label="BTC/JPY"></option>
-      <option value="金" label="金先物"></option>
-      <option value="ADA" label="カルダノ"></option>
-      <option value="SHIB" label="シバイヌ"></option>
-      <option value="XRP" label="リップル"></option>
-      <option value="ETH" label="イーサリアム"></option>
-    </datalist>
-  </div>
-  <div class="field">
-    <label>表示期間（騰落率の基準）</label>
-    <div class="seg" id="range-seg" role="group" aria-label="表示期間">
-      <button type="button" data-range="1d">1日</button>
-      <button type="button" data-range="5d">5日</button>
-      <button type="button" data-range="1mo">1ヶ月</button>
-      <button type="button" data-range="3mo">3ヶ月</button>
-      <button type="button" data-range="1y">1年</button>
+<div class="inner">
+  <div class="toolbar" id="toolbar">
+    <div class="field add-field">
+      <label for="sym-input">銘柄を登録</label>
+      <form class="add" id="add-form">
+        <input type="text" id="sym-input" list="popular" placeholder="7203 / AAPL / 金 / ドル円 / BTC" autocomplete="off" spellcheck="false">
+        <button class="btn primary" type="submit">追加</button>
+      </form>
+      <datalist id="popular">
+        <option value="7203" label="トヨタ自動車"></option>
+        <option value="6758" label="ソニーグループ"></option>
+        <option value="8035" label="東京エレクトロン"></option>
+        <option value="9432" label="NTT"></option>
+        <option value="AAPL" label="アップル"></option>
+        <option value="NVDA" label="エヌビディア"></option>
+        <option value="日経" label="日経平均"></option>
+        <option value="ダウ" label="NYダウ"></option>
+        <option value="ドル円" label="USD/JPY"></option>
+        <option value="金" label="金先物"></option>
+        <option value="原油" label="WTI原油"></option>
+        <option value="BTC" label="ビットコイン"></option>
+        <option value="ETH" label="イーサリアム"></option>
+      </datalist>
     </div>
+    <div class="field">
+      <label>表示期間（騰落率の基準）</label>
+      <div class="seg" id="range-seg" role="group" aria-label="表示期間">
+        <button type="button" data-range="1d">1日</button>
+        <button type="button" data-range="5d">5日</button>
+        <button type="button" data-range="1mo">1ヶ月</button>
+        <button type="button" data-range="3mo">3ヶ月</button>
+        <button type="button" data-range="1y">1年</button>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="field">
+      <label for="theme-sel">表示</label>
+      <select id="theme-sel"><option value="system">自動</option><option value="light">ライト</option><option value="dark">ダーク</option></select>
+    </div>
+    <button class="btn" type="button" id="edit-btn" aria-pressed="false">編集</button>
+    <button class="btn" type="button" id="reload-btn">更新</button>
+    <button class="btn" type="button" id="share-btn">共有URL</button>
+    <button class="btn" type="button" id="reset-btn">初期化</button>
   </div>
-  <div class="spacer"></div>
-  <div class="field">
-    <label for="theme-sel">表示</label>
-    <select id="theme-sel"><option value="system">自動</option><option value="light">ライト</option><option value="dark">ダーク</option></select>
-  </div>
-  <button class="btn" type="button" id="edit-btn" aria-pressed="false">編集</button>
-  <button class="btn" type="button" id="reload-btn">更新</button>
-  <button class="btn" type="button" id="share-btn">共有URL</button>
-  <button class="btn" type="button" id="reset-btn">初期化</button>
+  <div class="status"><span id="upd">—</span><span id="src"></span></div>
 </div>
 
-<div class="status"><span id="upd">—</span><span id="src"></span></div>
-
-<main class="wrap">
+<main class="inner">
   <div class="grid" id="grid"></div>
   <div class="empty" id="empty" hidden>
-    <div>登録銘柄がありません。上の入力欄から追加してください。</div>
+    <div>このタブに登録銘柄がありません。上の入力欄から追加してください。</div>
     <div class="chips" id="empty-chips"></div>
+  </div>
+  <div id="news-panel" hidden>
+    <div class="news-bar">
+      <div class="seg" id="news-seg" role="group" aria-label="ニュースの分類"></div>
+      <button class="btn" type="button" id="news-reload">更新</button>
+      <span class="nnote" id="news-note"></span>
+    </div>
+    <div class="news" id="news"></div>
+    <div class="nsrc" id="news-sources"></div>
   </div>
 </main>
 
-<footer>
+<footer class="inner">
   <div class="rule"></div>
   <div>
     <span class="legend"><span class="swatch" style="background:var(--up)"></span>上昇</span>
     <span class="legend"><span class="swatch" style="background:var(--down)"></span>下落</span>
-    <span>大きな騰落率は<b>選択中の表示期間</b>の変化率です（1日＝前日終値比）。点線はその基準値、右の目盛りは期間中の高値・安値と現在値。</span>
+    <span>大きな騰落率は<b>選択中の表示期間</b>の変化率（1日＝前日終値比）。点線はその基準値、右の目盛りは期間中の高値・安値と現在値。タイルをクリックすると詳細チャートが開きます。</span>
   </div>
-  <div>株価データは Yahoo Finance の公開チャートAPIから取得（ブラウザから直接取得できないため r.jina.ai の読み取り経由。暗号資産は CoinGecko を予備経路として使用）。日本株は20分程度の遅延があります。投資判断には証券会社の正式な値をご確認ください。市場ステータスは通常取引時間からの推定で、祝日は考慮していません。登録銘柄はこのブラウザに保存され、共有URLにも含まれます。</div>
+  <div>株価データは Yahoo Finance の公開チャートAPI（r.jina.ai の読み取り経由）、暗号資産の予備経路に CoinGecko、ニュースは Google ニュース・Yahoo Finance・CoinDesk の配信を使用。日本株は20分程度の遅延があります。投資判断には証券会社の正式な値をご確認ください。市場ステータスは通常取引時間からの推定で、祝日は考慮していません。登録銘柄はこのブラウザに保存されます。</div>
 </footer>
 
 <dialog id="detail">
@@ -294,42 +330,66 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
 <script>
 (function(){
   "use strict";
-  var LS_KEY = "kabuka-board-v2";
+  var LS_KEY = "kabuka-board-v3";
   var MOCK = /[?&]mock=1/.test(location.search);
-  var DEFAULTS = ["7203.T","6758.T","8035.T","9432.T","AAPL","NVDA","^N225","JPY=X","BTC-JPY"];
+
+  var CATS = [
+    { id:"jp",        label:"日本株" },
+    { id:"us",        label:"米国株" },
+    { id:"crypto",    label:"暗号資産" },
+    { id:"commodity", label:"商品" },
+    { id:"fx",        label:"為替" },
+    { id:"news",      label:"最新情報" }
+  ];
+  var PRESETS = {
+    jp:["^N225","7203.T","6758.T","8035.T","9432.T","9984.T","8306.T","6861.T","7974.T","6501.T"],
+    us:["^DJI","^GSPC","^IXIC","AAPL","NVDA","MSFT","AMZN","GOOGL","META","TSLA"],
+    crypto:["BTC-JPY","ETH-JPY","XRP-JPY","SOL-JPY","ADA-JPY","DOGE-JPY","SHIB-JPY","LTC-JPY"],
+    commodity:["GC=F","SI=F","PL=F","CL=F","BZ=F","NG=F","HG=F","ZC=F"],
+    fx:["JPY=X","EURJPY=X","GBPJPY=X","AUDJPY=X","CHFJPY=X","CADJPY=X","EURUSD=X","GBPUSD=X"]
+  };
+  var CHIPS = {
+    jp:["7203","6758","8035","9432","日経"], us:["AAPL","NVDA","TSLA","ダウ","sp500"],
+    crypto:["BTC","ETH","XRP","SOL"], commodity:["金","銀","原油","天然ガス"], fx:["ドル円","ユーロ円","ポンド円","豪ドル円"]
+  };
 
   var NAMES = {
     "7203.T":"トヨタ自動車","6758.T":"ソニーグループ","8035.T":"東京エレクトロン","9432.T":"NTT",
     "9984.T":"ソフトバンクG","8306.T":"三菱UFJ","6861.T":"キーエンス","6501.T":"日立製作所",
     "7974.T":"任天堂","9433.T":"KDDI","4063.T":"信越化学","6902.T":"デンソー","8058.T":"三菱商事",
+    "6098.T":"リクルート","4661.T":"オリエンタルランド","9983.T":"ファーストリテイリング",
     "AAPL":"アップル","NVDA":"エヌビディア","MSFT":"マイクロソフト","TSLA":"テスラ","AMZN":"アマゾン",
-    "GOOGL":"アルファベット","META":"メタ","AMD":"AMD","PLTR":"パランティア",
+    "GOOGL":"アルファベット","META":"メタ","AMD":"AMD","PLTR":"パランティア","AVGO":"ブロードコム",
     "^N225":"日経平均","^DJI":"NYダウ","^GSPC":"S&P500","^IXIC":"ナスダック総合","^VIX":"VIX指数",
     "^TNX":"米10年債利回り","^HSI":"ハンセン指数","^KS11":"韓国KOSPI","000001.SS":"上海総合",
+    "^GDAXI":"ドイツDAX","^FTSE":"英FTSE100",
     "JPY=X":"ドル円","EURJPY=X":"ユーロ円","EURUSD=X":"ユーロドル","GBPJPY=X":"ポンド円",
-    "GC=F":"金先物","CL=F":"WTI原油","SI=F":"銀先物",
-    "BTC-JPY":"ビットコイン円","ETH-JPY":"イーサリアム円","BTC-USD":"ビットコイン"
+    "AUDJPY=X":"豪ドル円","CHFJPY=X":"スイスフラン円","CADJPY=X":"カナダドル円","NZDJPY=X":"NZドル円",
+    "CNYJPY=X":"人民元円","GBPUSD=X":"ポンドドル","AUDUSD=X":"豪ドル米ドル",
+    "GC=F":"金","SI=F":"銀","PL=F":"プラチナ","HG=F":"銅","CL=F":"WTI原油","BZ=F":"ブレント原油",
+    "NG=F":"天然ガス","ZC=F":"とうもろこし","ZS=F":"大豆","ZW=F":"小麦","KC=F":"コーヒー"
   };
   var SUBS = {
     "^N225":"NIKKEI 225","^DJI":"DOW 30","^GSPC":"S&P 500","^IXIC":"NASDAQ COMP","^VIX":"VIX",
-    "^TNX":"US 10Y","JPY=X":"USD／JPY","GC=F":"GOLD FUT","CL=F":"WTI FUT","SI=F":"SILVER FUT",
-    "^HSI":"HANG SENG","^KS11":"KOSPI","000001.SS":"SHANGHAI"
+    "^TNX":"US 10Y","^HSI":"HANG SENG","^KS11":"KOSPI","000001.SS":"SHANGHAI","^GDAXI":"DAX","^FTSE":"FTSE 100",
+    "GC=F":"GOLD FUT","SI=F":"SILVER FUT","PL=F":"PLATINUM","HG=F":"COPPER","CL=F":"WTI FUT",
+    "BZ=F":"BRENT FUT","NG=F":"NAT GAS","ZC=F":"CORN","ZS=F":"SOYBEAN","ZW=F":"WHEAT","KC=F":"COFFEE"
   };
   var ALIASES = {
     "日経":"^N225","日経平均":"^N225","日経225":"^N225","nikkei":"^N225",
     "ダウ":"^DJI","dow":"^DJI","nyダウ":"^DJI","sp500":"^GSPC","s&p500":"^GSPC","spx":"^GSPC",
-    "ナスダック":"^IXIC","nasdaq":"^IXIC","ixic":"^IXIC",
-    "ドル円":"JPY=X","usdjpy":"JPY=X","usd/jpy":"JPY=X",
-    "ユーロ円":"EURJPY=X","eurjpy":"EURJPY=X","ユーロドル":"EURUSD=X","eurusd":"EURUSD=X",
-    "ポンド円":"GBPJPY=X","gbpjpy":"GBPJPY=X",
-    "金":"GC=F","ゴールド":"GC=F","gold":"GC=F","銀":"SI=F","原油":"CL=F","oil":"CL=F","wti":"CL=F",
-    "ビットコイン":"BTC-JPY","btc":"BTC-JPY","btcjpy":"BTC-JPY","イーサリアム":"ETH-JPY","eth":"ETH-JPY",
-    "vix":"^VIX","米10年債":"^TNX","ハンセン":"^HSI","上海":"000001.SS","kospi":"^KS11","韓国":"^KS11"
+    "ナスダック":"^IXIC","nasdaq":"^IXIC","ixic":"^IXIC","vix":"^VIX","米10年債":"^TNX",
+    "ハンセン":"^HSI","上海":"000001.SS","kospi":"^KS11","韓国":"^KS11","ドイツ":"^GDAXI","イギリス":"^FTSE",
+    "ドル円":"JPY=X","usdjpy":"JPY=X","usd/jpy":"JPY=X","ユーロ円":"EURJPY=X","eurjpy":"EURJPY=X",
+    "ユーロドル":"EURUSD=X","eurusd":"EURUSD=X","ポンド円":"GBPJPY=X","gbpjpy":"GBPJPY=X",
+    "豪ドル円":"AUDJPY=X","audjpy":"AUDJPY=X","スイスフラン円":"CHFJPY=X","カナダドル円":"CADJPY=X",
+    "nzドル円":"NZDJPY=X","人民元円":"CNYJPY=X","ポンドドル":"GBPUSD=X",
+    "金":"GC=F","ゴールド":"GC=F","gold":"GC=F","銀":"SI=F","silver":"SI=F","プラチナ":"PL=F","白金":"PL=F",
+    "銅":"HG=F","copper":"HG=F","原油":"CL=F","oil":"CL=F","wti":"CL=F","ブレント":"BZ=F","brent":"BZ=F",
+    "天然ガス":"NG=F","とうもろこし":"ZC=F","大豆":"ZS=F","小麦":"ZW=F","コーヒー":"KC=F",
+    "ビットコイン":"BTC-JPY","イーサリアム":"ETH-JPY","リップル":"XRP-JPY","ソラナ":"SOL-JPY",
+    "カルダノ":"ADA-JPY","シバイヌ":"SHIB-JPY","ドージコイン":"DOGE-JPY"
   };
-  var OLD_MAP = { "TVC:NI225":"^N225","TVC:DJI":"^DJI","TVC:SPX":"^GSPC","TVC:NDX":"^IXIC",
-    "TVC:IXIC":"^IXIC","TVC:VIX":"^VIX","TVC:US10Y":"^TNX","TVC:GOLD":"GC=F","TVC:USOIL":"CL=F",
-    "FX:USDJPY":"JPY=X","FX:EURJPY":"EURJPY=X","FX:EURUSD":"EURUSD=X","BITFLYER:BTCJPY":"BTC-JPY" };
-
   var COINS = {
     BTC:{ id:"bitcoin", ja:"ビットコイン" }, ETH:{ id:"ethereum", ja:"イーサリアム" },
     XRP:{ id:"ripple", ja:"リップル" }, ADA:{ id:"cardano", ja:"カルダノ" },
@@ -342,7 +402,6 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
     NEAR:{ id:"near", ja:"NEAR" }, SUI:{ id:"sui", ja:"SUI" }, PEPE:{ id:"pepe", ja:"ペペ" },
     LINK:{ id:"chainlink", ja:"チェーンリンク" }, MATIC:{ id:"matic-network", ja:"ポリゴン" }
   };
-  // 株式ティッカーと衝突しやすいものは、単体入力では暗号資産に寄せない
   var COIN_AMBIGUOUS = { LINK:1, ETC:1, NEAR:1, SUI:1, TON:1 };
   function coinOf(sym){
     var m = String(sym).match(/^([A-Z0-9]{2,6})-(JPY|USD)$/);
@@ -359,42 +418,13 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
     "5y":  { range:"5y",  interval:"1wk", label:"5年",   daily:true  }
   };
 
-  var state = { list:DEFAULTS.slice(), range:"1d", theme:"system" };
+  var state = { lists:{}, tab:"jp", range:"1d", theme:"system", newsCat:"all" };
   var cache = {}, transports = null, lastUpdate = 0, uid = 0;
   var grid = document.getElementById("grid"), empty = document.getElementById("empty");
   var updEl = document.getElementById("upd"), srcEl = document.getElementById("src");
+  var newsPanel = document.getElementById("news-panel"), toolbar = document.getElementById("toolbar");
 
-  /* ---------- storage ---------- */
-  function load(){
-    try{
-      var raw = localStorage.getItem(LS_KEY) || localStorage.getItem("kabuka-board-v1");
-      if(raw){
-        var s = JSON.parse(raw);
-        if(Array.isArray(s.list)) state.list = s.list.map(migrate).filter(Boolean).slice(0,60);
-        if(s.theme) state.theme = s.theme;
-        if(RANGES[s.range]) state.range = s.range;
-      }
-    }catch(e){}
-    readHash();
-  }
-  function migrate(sym){
-    if(!sym) return "";
-    if(OLD_MAP[sym]) return OLD_MAP[sym];
-    if(/^TSE:/.test(sym)) return sym.slice(4) + ".T";
-    if(COINS[sym] && !COIN_AMBIGUOUS[sym]) return sym + "-JPY";
-    if(sym.indexOf(":") > -1) return sym.split(":")[1];
-    return sym;
-  }
-  function readHash(){
-    var h = location.hash.replace(/^#/,"");
-    if(!h) return;
-    var p = new URLSearchParams(h);
-    if(p.get("s")) state.list = p.get("s").split(",").map(function(x){return migrate(x.trim());}).filter(Boolean);
-    if(RANGES[p.get("r")]) state.range = p.get("r");
-  }
-  function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
-
-  /* ---------- symbols ---------- */
+  /* ---------------- symbols ---------------- */
   function normalize(raw){
     var v = String(raw||"").trim();
     if(!v) return "";
@@ -405,11 +435,16 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
     if(/^[0-9]{4}[A-Za-z]?\.(t|jp)$/i.test(v)) return v.split(".")[0].toUpperCase() + ".T";
     var up = v.toUpperCase();
     if(COINS[up] && !COIN_AMBIGUOUS[up]) return up + "-JPY";
-    if(/^([A-Z0-9]{2,6})(JPY|USD)$/.test(up)){
-      var mm = up.match(/^([A-Z0-9]{2,6})(JPY|USD)$/);
-      if(COINS[mm[1]]) return mm[1] + "-" + mm[2];
-    }
+    var mm = up.match(/^([A-Z0-9]{2,6})(JPY|USD)$/);
+    if(mm && COINS[mm[1]]) return mm[1] + "-" + mm[2];
     return up;
+  }
+  function catOf(sym){
+    if(coinOf(sym)) return "crypto";
+    if(/=F$/.test(sym)) return "commodity";
+    if(/=X$/.test(sym)) return "fx";
+    if(/\.T$/.test(sym) || sym === "^N225" || sym === "^TOPX") return "jp";
+    return "us";
   }
   function nameOf(sym){
     if(NAMES[sym]) return NAMES[sym];
@@ -442,21 +477,91 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
     GBP:"🇬🇧",AUD:"🇦🇺",NZD:"🇳🇿",
     CAD:"🇨🇦",CHF:"🇨🇭",CNY:"🇨🇳",
     KRW:"🇰🇷",HKD:"🇭🇰",TRY:"🇹🇷" };
+  var COMMODITY_ICON = { "GC=F":"🥇","SI=F":"🥈","PL=F":"⚪","HG=F":"🟠",
+    "CL=F":"🛢","BZ=F":"🛢","NG=F":"🔥","ZC=F":"🌽",
+    "ZS=F":"🫘","ZW=F":"🌾","KC=F":"☕" };
   function flagOf(sym){
-    if(/^BTC|^ETH|^XRP|^SOL|^DOGE/.test(sym)) return "₿";
-    if(sym === "GC=F") return "🥇";
-    if(sym === "SI=F") return "🥈";
-    if(sym === "CL=F") return "🛢";
+    var co = coinOf(sym);
+    if(co) return co.t === "BTC" ? "₿" : co.t === "ETH" ? "Ξ" : "🪙";
+    if(COMMODITY_ICON[sym]) return COMMODITY_ICON[sym];
+    if(/=F$/.test(sym)) return "📦";
     var m = sym.match(/^([A-Z]{3})([A-Z]{3})?=X$/);
     if(m) return CCY_FLAG[m[2] ? m[1] : "USD"] || "💱";
     var c = cache[sym];
     if(c && c.meta && c.meta.exchangeTimezoneName && TZ_FLAG[c.meta.exchangeTimezoneName]) return TZ_FLAG[c.meta.exchangeTimezoneName];
     if(/\.T$/.test(sym) || sym === "^N225") return TZ_FLAG["Asia/Tokyo"];
-    if(/^\^/.test(sym) || /^[A-Z.]{1,6}$/.test(sym)) return TZ_FLAG["America/New_York"];
-    return "📈";
+    if(sym === "^HSI") return TZ_FLAG["Asia/Hong_Kong"];
+    if(sym === "^KS11") return TZ_FLAG["Asia/Seoul"];
+    if(sym === "000001.SS") return TZ_FLAG["Asia/Shanghai"];
+    if(sym === "^GDAXI") return TZ_FLAG["Europe/Berlin"];
+    if(sym === "^FTSE") return TZ_FLAG["Europe/London"];
+    return TZ_FLAG["America/New_York"];
   }
 
-  /* ---------- data ---------- */
+  /* ---------------- storage ---------------- */
+  function emptyLists(){ return { jp:[], us:[], crypto:[], commodity:[], fx:[] }; }
+  function load(){
+    var lists = null;
+    try{
+      var raw = localStorage.getItem(LS_KEY);
+      if(raw){
+        var s = JSON.parse(raw);
+        if(s.lists) lists = s.lists;
+        if(s.theme) state.theme = s.theme;
+        if(RANGES[s.range]) state.range = s.range;
+        if(s.tab) state.tab = s.tab;
+        if(s.newsCat) state.newsCat = s.newsCat;
+      }
+      if(!lists){
+        var old = localStorage.getItem("kabuka-board-v2") || localStorage.getItem("kabuka-board-v1");
+        lists = emptyLists();
+        if(old){
+          var o = JSON.parse(old);
+          if(o.theme) state.theme = o.theme;
+          if(RANGES[o.range]) state.range = o.range;
+          (o.list || []).map(migrate).filter(Boolean).forEach(function(sym){
+            var c = catOf(sym);
+            if(lists[c].indexOf(sym) < 0) lists[c].push(sym);
+          });
+        }
+        Object.keys(PRESETS).forEach(function(c){
+          PRESETS[c].forEach(function(sym){ if(lists[c].indexOf(sym) < 0) lists[c].push(sym); });
+        });
+      }
+    }catch(e){ lists = null; }
+    if(!lists){
+      lists = emptyLists();
+      Object.keys(PRESETS).forEach(function(c){ lists[c] = PRESETS[c].slice(); });
+    }
+    Object.keys(emptyLists()).forEach(function(c){ if(!Array.isArray(lists[c])) lists[c] = []; });
+    state.lists = lists;
+    readHash();
+  }
+  function migrate(sym){
+    if(!sym) return "";
+    var OLD = { "TVC:NI225":"^N225","TVC:DJI":"^DJI","TVC:SPX":"^GSPC","TVC:NDX":"^IXIC","TVC:IXIC":"^IXIC",
+      "TVC:VIX":"^VIX","TVC:US10Y":"^TNX","TVC:GOLD":"GC=F","TVC:USOIL":"CL=F","FX:USDJPY":"JPY=X",
+      "FX:EURJPY":"EURJPY=X","FX:EURUSD":"EURUSD=X","BITFLYER:BTCJPY":"BTC-JPY" };
+    if(OLD[sym]) return OLD[sym];
+    if(/^TSE:/.test(sym)) return sym.slice(4) + ".T";
+    if(COINS[sym] && !COIN_AMBIGUOUS[sym]) return sym + "-JPY";
+    if(sym.indexOf(":") > -1) return sym.split(":")[1];
+    return sym;
+  }
+  function readHash(){
+    var h = location.hash.replace(/^#/,"");
+    if(!h) return;
+    var p = new URLSearchParams(h);
+    Object.keys(state.lists).forEach(function(c){
+      if(p.get(c)) state.lists[c] = p.get(c).split(",").map(function(x){ return migrate(x.trim()); }).filter(Boolean);
+    });
+    if(RANGES[p.get("r")]) state.range = p.get("r");
+    if(p.get("t")) state.tab = p.get("t");
+  }
+  function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
+  function curList(){ return state.lists[state.tab] || []; }
+
+  /* ---------------- data ---------------- */
   function yahooUrl(sym, rk){
     var r = RANGES[rk] || RANGES["1d"];
     return "https://query1.finance.yahoo.com/v8/finance/chart/" + encodeURIComponent(sym) +
@@ -479,42 +584,20 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
       catch(e2){ throw new Error("データ形式が不正"); }
     }
   }
-  function fetchOne(url, t){
+  function grabText(url, t, ms){
     var ac = new AbortController();
-    var timer = setTimeout(function(){ ac.abort(); }, 14000);
-    return fetch(t.wrap(url), { signal:ac.signal, cache:"no-store", referrerPolicy:"no-referrer" })
+    var timer = setTimeout(function(){ ac.abort(); }, ms || 14000);
+    return fetch(t ? t.wrap(url) : url, { signal:ac.signal, cache:"no-store", referrerPolicy:"no-referrer" })
       .then(function(r){
         if(!r.ok) throw new Error(r.status === 429 ? "混雑（429）" : "HTTP " + r.status);
         return r.text();
       })
-      .then(function(txt){
-        var j = extractJson(txt);
-        if(!j.chart) throw new Error("データ形式が不正");
-        if(j.chart.error) throw new Error(j.chart.error.description || "銘柄が見つかりません");
-        clearTimeout(timer); return j;
-      }, function(e){
-        clearTimeout(timer);
-        if(e && (e.name === "AbortError" || /aborted/i.test(e.message || ""))) throw new Error("タイムアウト");
-        throw e;
-      });
-  }
-  function fetchCoinGecko(sym, rk){
-    var co = coinOf(sym);
-    if(!co) return Promise.reject(new Error("暗号資産ではありません"));
-    var c = { id:co.info.id, vs:co.vs };
-    var days = { "1d":1, "5d":5, "1mo":30, "3mo":90, "1y":365, "5y":1825 }[rk] || 1;
-    var u = "https://api.coingecko.com/api/v3/coins/" + c.id + "/market_chart?vs_currency=" + c.vs + "&days=" + days;
-    return fetch(u, { cache:"no-store" })
-      .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-      .then(function(j){
-        var pr = j.prices || [];
-        if(!pr.length) throw new Error("データなし");
-        var series = pr.map(function(p){ return { t:Math.floor(p[0]/1000), v:p[1] }; });
-        srcEl.textContent = "取得経路: CoinGecko";
-        return { price:series[series.length-1].v, prev:series[0].v, series:series,
-                 meta:{ currency:c.vs.toUpperCase(), fullExchangeName:"COINGECKO", priceHint:0 },
-                 hi:null, lo:null, vol:null, time:series[series.length-1].t };
-      });
+      .then(function(txt){ clearTimeout(timer); return txt; },
+            function(e){
+              clearTimeout(timer);
+              if(e && (e.name === "AbortError" || /aborted/i.test(e.message || ""))) throw new Error("タイムアウト");
+              throw e;
+            });
   }
   function fetchYahoo(sym, rk){
     var url = yahooUrl(sym, rk);
@@ -523,17 +606,15 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
     function attempt(){
       if(i >= order.length) return Promise.reject(lastErr || new Error("全ての取得経路が失敗"));
       var t = order[i++];
-      return fetchOne(url, t).then(function(j){
-        transports = t; srcEl.textContent = "取得経路: " + t.name; return j;
-      }, function(e){ lastErr = e; return attempt(); });
+      return grabText(url, t).then(function(txt){
+        var j = extractJson(txt);
+        if(!j.chart) throw new Error("データ形式が不正");
+        if(j.chart.error) throw new Error(j.chart.error.description || "銘柄が見つかりません");
+        transports = t; srcEl.textContent = "取得経路: " + t.name;
+        return j;
+      }).catch(function(e){ lastErr = e; return attempt(); });
     }
     return attempt();
-  }
-  function getData(sym, rk){
-    return fetchYahoo(sym, rk).then(parseChart).catch(function(e){
-      if(coinOf(sym)) return fetchCoinGecko(sym, rk);
-      throw e;
-    });
   }
   function parseChart(j){
     var res = j.chart.result && j.chart.result[0];
@@ -549,13 +630,35 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
     var prev = meta.chartPreviousClose;
     if(prev === undefined || prev === null) prev = meta.previousClose;
     if((prev === undefined || prev === null) && series.length) prev = series[0].v;
-    return { price:price, prev:prev, series:series, meta:meta,
-      hi:meta.regularMarketDayHigh, lo:meta.regularMarketDayLow,
-      vol:meta.regularMarketVolume, time:meta.regularMarketTime };
+    return { price:price, prev:prev, series:series, meta:meta, vol:meta.regularMarketVolume, time:meta.regularMarketTime };
+  }
+  function fetchCoinGecko(sym, rk){
+    var co = coinOf(sym);
+    if(!co) return Promise.reject(new Error("暗号資産ではありません"));
+    var days = { "1d":1, "5d":5, "1mo":30, "3mo":90, "1y":365, "5y":1825 }[rk] || 1;
+    var u = "https://api.coingecko.com/api/v3/coins/" + co.info.id + "/market_chart?vs_currency=" + co.vs + "&days=" + days;
+    return fetch(u, { cache:"no-store" })
+      .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function(j){
+        var pr = j.prices || [];
+        if(!pr.length) throw new Error("データなし");
+        var series = pr.map(function(p){ return { t:Math.floor(p[0]/1000), v:p[1] }; });
+        srcEl.textContent = "取得経路: CoinGecko";
+        return { price:series[series.length-1].v, prev:series[0].v, series:series,
+                 meta:{ currency:co.vs.toUpperCase(), fullExchangeName:"COINGECKO", priceHint:0 },
+                 vol:null, time:series[series.length-1].t };
+      });
+  }
+  function getData(sym, rk){
+    return fetchYahoo(sym, rk).then(parseChart).catch(function(e){
+      if(coinOf(sym)) return fetchCoinGecko(sym, rk);
+      throw e;
+    });
   }
   function mockData(sym, rk){
-    var n = rk === "1d" ? 78 : rk === "5d" ? 130 : 180;
-    var base = /\.T$/.test(sym) ? 3200 : sym === "^N225" ? 42000 : sym === "JPY=X" ? 156.8 : sym === "BTC-JPY" ? 12714338 : 220;
+    var n = rk === "1d" ? 78 : 160;
+    var base = /\.T$/.test(sym) ? 3200 : sym === "^N225" ? 42000 : /=X$/.test(sym) ? 156.8 :
+               /-JPY$/.test(sym) ? 12714338 : /=F$/.test(sym) ? 2400 : 220;
     var seed = sym.charCodeAt(0) * 7 + sym.length, v = base, out = [];
     for(var i=0;i<n;i++){
       seed = (seed * 9301 + 49297) % 233280;
@@ -563,39 +666,39 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
       out.push({ t: Math.floor(Date.now()/1000) - (n-i)*300, v:v });
     }
     return { price:out[n-1].v, prev:base, series:out,
-      meta:{ currency:/\.T$|N225|JPY/.test(sym) ? "JPY" : "USD",
-             exchangeTimezoneName:/\.T$|N225/.test(sym) ? "Asia/Tokyo" : "America/New_York", priceHint:2 },
-      hi:base*1.012, lo:base*0.988, vol:12345678, time:Math.floor(Date.now()/1000) };
+      meta:{ currency:/\.T$|N225|JPY/.test(sym) ? "JPY":"USD", exchangeTimezoneName:/\.T$|N225/.test(sym) ? "Asia/Tokyo":"America/New_York", priceHint:2 },
+      vol:12345678, time:Math.floor(Date.now()/1000) };
   }
 
   function refresh(){
-    if(!state.list.length){ render(); return; }
+    if(state.tab === "news"){ loadNews(); return; }
+    var pending = curList().slice();
+    if(!pending.length){ render(); updEl.textContent = "—"; return; }
     updEl.textContent = "更新中…";
-    var pending = state.list.slice(), done = 0;
+    var done = 0;
     pending.forEach(function(sym, idx){
       setTimeout(function(){
         var p = MOCK ? Promise.resolve(mockData(sym, state.range)) : getData(sym, state.range);
         p.then(function(d){ cache[sym] = d; }, function(e){
           var old = cache[sym];
           cache[sym] = { err:(e && e.message) || "取得失敗", price: old && old.price, prev: old && old.prev,
-                         series:(old && old.series) || [], meta:(old && old.meta) || {}, stale:!!old };
+                         series:(old && old.series) || [], meta:(old && old.meta) || {} };
         }).then(function(){
           done++;
-          if(done === pending.length){ lastUpdate = Date.now(); render(); stamp(); }
+          if(done === pending.length){ lastUpdate = Date.now(); render(); stamp(pending); }
           else if(done % 3 === 0) render();
         });
       }, idx * 220);
     });
   }
-  function stamp(){
-    var fails = state.list.filter(function(s){ return cache[s] && cache[s].err; }).length;
-    var t = new Date(lastUpdate);
-    var p2 = function(n){ return ("0"+n).slice(-2); };
+  function stamp(listed){
+    var fails = listed.filter(function(s){ return cache[s] && cache[s].err; }).length;
+    var t = new Date(lastUpdate), p2 = function(n){ return ("0"+n).slice(-2); };
     updEl.innerHTML = "最終更新 " + p2(t.getHours()) + ":" + p2(t.getMinutes()) + ":" + p2(t.getSeconds()) +
       (fails ? ' <span class="warn">／ ' + fails + '件が取得できませんでした</span>' : "");
   }
 
-  /* ---------- format ---------- */
+  /* ---------------- format ---------------- */
   function decimalsFor(sym, price, meta){
     if(/=X$/.test(sym)) return /JPY=X$/.test(sym) ? 3 : 4;
     if(meta && typeof meta.priceHint === "number" && Math.abs(price) < 1000) return Math.min(meta.priceHint, 4);
@@ -616,8 +719,9 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
   }
   function dirOf(c){ return c > 0 ? "up" : c < 0 ? "down" : "flat"; }
   function signed(v, dec){ return (v > 0 ? "+" : "") + fmt(v, dec); }
+  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
 
-  /* ---------- analytics for the displayed period ---------- */
+  /* ---------------- analysis ---------------- */
   function analyse(sym, d, rk){
     var r = RANGES[rk] || RANGES["1d"];
     var s = d.series || [];
@@ -633,70 +737,123 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
     var vals = s.map(function(p){ return p.v; });
     var hi = vals.length ? Math.max.apply(null, vals) : null;
     var lo = vals.length ? Math.min.apply(null, vals) : null;
+    var min = lo, max = hi;
+    if(base && isFinite(base)){ min = Math.min(min === null ? base : min, base); max = Math.max(max === null ? base : max, base); }
+    var pad = (max - min) * 0.10 || Math.abs((max || 1) * 0.002) || 1;
     return { last:last, base:base, chg:chg, pct:pct, dir:chg === null ? "flat" : dirOf(chg),
-             hi:hi, lo:lo, day:day, label:r.label };
+             hi:hi, lo:lo, day:day, label:r.label, min:min - pad, max:max + pad };
+  }
+  function yPct(a, v){
+    var span = (a.max - a.min) || 1;
+    return 100 - ((v - a.min) / span) * 100;
   }
 
-  /* ---------- chart ---------- */
-  function chartSvg(series, base, dir, opts){
+  /* ---------------- chart ---------------- */
+  function chartSvg(series, a, opts){
     opts = opts || {};
     var W = 300, H = 100;
     if(!series || series.length < 2) return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none"></svg>';
     var vals = series.map(function(p){ return p.v; });
-    var min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
-    if(base && isFinite(base)){ min = Math.min(min, base); max = Math.max(max, base); }
-    var pad = (max - min) * 0.10 || Math.abs(max * 0.002) || 1;
-    min -= pad; max += pad;
-    var span = (max - min) || 1, n = series.length;
-    var X = function(i){ return (i/(n-1))*W; }, Y = function(v){ return H - ((v-min)/span)*H; };
+    var n = series.length;
+    var X = function(i){ return (i/(n-1))*W; };
+    var Y = function(v){ return (yPct(a, v) / 100) * H; };
     var d = "", i;
     for(i=0;i<n;i++) d += (i ? "L" : "M") + X(i).toFixed(2) + " " + Y(vals[i]).toFixed(2) + " ";
     var area = d + "L" + W + " " + H + " L0 " + H + " Z";
     var id = "g" + (++uid);
-    var col = dir === "down" ? "var(--down)" : dir === "up" ? "var(--up)" : "var(--flat)";
-    var soft = dir === "down" ? "var(--down-line)" : dir === "up" ? "var(--up-line)" : "rgba(128,128,128,.2)";
-    var v = "";
-    var cols = opts.vgrid || 5;
-    for(i=1;i<cols;i++) v += '<line x1="'+((W/cols)*i).toFixed(1)+'" y1="0" x2="'+((W/cols)*i).toFixed(1)+'" y2="'+H+'" stroke="var(--line-2)" stroke-width="1" vector-effect="non-scaling-stroke"/>';
-    if(opts.hgrid){
-      for(i=1;i<4;i++) v += '<line x1="0" y1="'+((H/4)*i).toFixed(1)+'" x2="'+W+'" y2="'+((H/4)*i).toFixed(1)+'" stroke="var(--line-2)" stroke-width="1" vector-effect="non-scaling-stroke"/>';
-    }
+    var col = a.dir === "down" ? "var(--down)" : a.dir === "up" ? "var(--up)" : "var(--flat)";
+    var soft = a.dir === "down" ? "var(--down-line)" : a.dir === "up" ? "var(--up-line)" : "rgba(128,128,128,.22)";
+    var g = "", cols = opts.vgrid || 5, rows = opts.hgrid || 3;
+    for(i=1;i<cols;i++) g += '<line x1="'+((W/cols)*i).toFixed(1)+'" y1="0" x2="'+((W/cols)*i).toFixed(1)+'" y2="'+H+'" stroke="var(--line-2)" stroke-width="1" vector-effect="non-scaling-stroke"/>';
+    for(i=1;i<rows;i++) g += '<line x1="0" y1="'+((H/rows)*i).toFixed(1)+'" x2="'+W+'" y2="'+((H/rows)*i).toFixed(1)+'" stroke="var(--line-2)" stroke-width="1" vector-effect="non-scaling-stroke"/>';
     var baseLine = "";
-    if(base && isFinite(base)){
-      baseLine = '<line x1="0" y1="'+Y(base).toFixed(2)+'" x2="'+W+'" y2="'+Y(base).toFixed(2)+
+    if(a.base && isFinite(a.base)){
+      baseLine = '<line x1="0" y1="'+Y(a.base).toFixed(2)+'" x2="'+W+'" y2="'+Y(a.base).toFixed(2)+
         '" stroke="'+soft+'" stroke-width="1.25" stroke-dasharray="4 3" vector-effect="non-scaling-stroke"/>';
     }
     return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" aria-hidden="true">' +
       '<defs><linearGradient id="'+id+'" x1="0" y1="0" x2="0" y2="1">' +
-        '<stop offset="0%" stop-color="'+col+'" stop-opacity="'+(opts.big ? ".22" : ".18")+'"/>' +
+        '<stop offset="0%" stop-color="'+col+'" stop-opacity="'+(opts.big ? ".24" : ".18")+'"/>' +
         '<stop offset="100%" stop-color="'+col+'" stop-opacity="0"/></linearGradient></defs>' +
-      v + '<path d="'+area+'" fill="url(#'+id+')"/>' + baseLine +
+      g + '<path d="'+area+'" fill="url(#'+id+')"/>' + baseLine +
       '<path d="'+d+'" fill="none" stroke="'+col+'" stroke-width="'+(opts.big ? 2 : 1.7)+
         '" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>' +
       '<circle cx="'+X(n-1).toFixed(2)+'" cy="'+Y(vals[n-1]).toFixed(2)+'" r="'+(opts.big ? 3 : 2.4)+
         '" fill="'+col+'" stroke="var(--surface)" stroke-width="1.2" vector-effect="non-scaling-stroke"/></svg>';
   }
-  function gutter(a, dec){
-    if(a.hi === null || a.lo === null) return "";
-    var min = Math.min(a.lo, a.base || a.lo), max = Math.max(a.hi, a.base || a.hi);
-    var pad = (max - min) * 0.10 || Math.abs(max * 0.002) || 1;
-    min -= pad; max += pad;
-    var span = (max - min) || 1;
-    var y = 100 - ((a.last - min) / span) * 100;
-    y = Math.max(11, Math.min(89, y));
-    var showHi = y > 31, showLo = y < 69;
-    return '<div class="gut">' +
-      (showHi ? '<span class="pill hi mono">' + fmt(a.hi, dec) + '</span>' : "") +
-      (showLo ? '<span class="pill lo mono">' + fmt(a.lo, dec) + '</span>' : "") +
-      '<span class="pill now mono ' + a.dir + '" style="top:' + y.toFixed(1) + '%">' + fmt(a.last, dec) + '</span>' +
-      '</div>';
+  function gutterHtml(a, dec, big){
+    if(a.last === null) return "";
+    var y = Math.max(9, Math.min(91, yPct(a, a.last)));
+    var html = '<div class="gut">';
+    if(big){
+      for(var k=0;k<=4;k++){
+        var v = a.max - (a.max - a.min) * (k/4);
+        var yy = (k/4) * 100;
+        if(Math.abs(yy - y) > 9) html += '<span class="pill ax mono" style="top:'+yy.toFixed(1)+'%">'+fmt(v, dec)+'</span>';
+      }
+    } else {
+      if(y > 31 && a.hi !== null) html += '<span class="pill hi mono">' + fmt(a.hi, dec) + '</span>';
+      if(y < 69 && a.lo !== null) html += '<span class="pill lo mono">' + fmt(a.lo, dec) + '</span>';
+    }
+    html += '<span class="pill now mono ' + a.dir + '" style="top:' + y.toFixed(1) + '%">' + fmt(a.last, dec) + '</span>';
+    return html + '</div>';
+  }
+  function xAxisHtml(series, rk){
+    if(!series || series.length < 2) return "";
+    var n = series.length, out = '<div class="xaxis">';
+    for(var k=0;k<=4;k++){
+      var i = Math.min(n-1, Math.round((n-1) * (k/4)));
+      var t = series[i].t ? new Date(series[i].t * 1000) : null;
+      if(!t) continue;
+      var lab;
+      if(rk === "1d" || rk === "5d") lab = t.toLocaleString("ja-JP", { month:"numeric", day:"numeric", hour:"2-digit", minute:"2-digit" });
+      else if(rk === "5y") lab = t.toLocaleDateString("ja-JP", { year:"numeric", month:"numeric" });
+      else lab = t.toLocaleDateString("ja-JP", { month:"numeric", day:"numeric" });
+      out += '<span style="left:' + ((k/4)*100).toFixed(1) + '%">' + esc(lab) + '</span>';
+    }
+    return out + '</div>';
   }
 
-  /* ---------- render ---------- */
+  /* ---------------- render ---------------- */
+  function renderTabs(){
+    var box = document.getElementById("tabs");
+    box.textContent = "";
+    CATS.forEach(function(c){
+      var b = document.createElement("button");
+      b.className = "tab"; b.type = "button"; b.setAttribute("role","tab");
+      b.setAttribute("aria-selected", String(c.id === state.tab));
+      b.innerHTML = esc(c.label) + (c.id === "news" ? "" : '<span class="cnt">' + ((state.lists[c.id]||[]).length) + '</span>');
+      b.addEventListener("click", function(){ switchTab(c.id); });
+      box.appendChild(b);
+    });
+  }
+  function switchTab(id){
+    state.tab = id; save(); renderTabs();
+    var isNews = id === "news";
+    toolbar.hidden = isNews;
+    newsPanel.hidden = !isNews;
+    grid.hidden = isNews;
+    empty.hidden = true;
+    if(isNews){ updEl.textContent = ""; srcEl.textContent = ""; renderNewsTabs(); loadNews(); }
+    else { render(); refresh(); }
+  }
   function render(){
+    if(state.tab === "news") return;
     grid.textContent = "";
-    empty.hidden = state.list.length > 0;
-    state.list.forEach(function(sym, i){ grid.appendChild(tile(sym, i)); });
+    var list = curList();
+    empty.hidden = list.length > 0;
+    if(!list.length) renderChips();
+    list.forEach(function(sym, i){ grid.appendChild(tile(sym, i)); });
+  }
+  function renderChips(){
+    var box = document.getElementById("empty-chips");
+    box.textContent = "";
+    (CHIPS[state.tab] || []).forEach(function(s){
+      var c = document.createElement("button");
+      c.type = "button"; c.className = "chip"; c.textContent = s;
+      c.addEventListener("click", function(){ add(s); });
+      box.appendChild(c);
+    });
   }
   function tile(sym, i){
     var d = cache[sym] || {};
@@ -706,7 +863,7 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
 
     var head = '<div class="card-head"><span class="flag" aria-hidden="true">' + flagOf(sym) + '</span>' +
       '<div class="titles"><span class="nm">' + esc(nameOf(sym)) + '</span>' +
-      '<span class="sub">' + esc(subOf(sym)) + '</span></div></div>';
+      '<span class="sub">' + esc(subOf(sym)) + '</span></div><span class="zoom">詳細 ›</span></div>';
 
     var body;
     if(d.price === undefined || d.price === null){
@@ -721,15 +878,14 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
       body =
         '<div class="price"><span class="int mono">' + sp.int + '</span><span class="dec mono">' + sp.dec + '</span>' +
           (cur ? '<span class="cur">' + esc(cur) + '</span>' : "") + '</div>' +
-        '<div class="chartbox">' + chartSvg(d.series, a.base, a.dir) + gutter(a, dec) + '</div>' +
+        '<div class="chartbox">' + chartSvg(d.series, a, { hgrid:3, vgrid:5 }) + gutterHtml(a, dec, false) + '</div>' +
         '<div class="foot ' + a.dir + '">' +
-          '<span class="pct mono ' + a.dir + '">' + (a.pct === null ? "—" : (a.pct > 0 ? "+" : "") + a.pct.toFixed(2)) +
-            '<span class="u">%</span></span>' +
+          '<span class="pct mono ' + a.dir + '">' + (a.pct === null ? "—" : (a.pct > 0 ? "+" : "") + a.pct.toFixed(2)) + '<span class="u">%</span></span>' +
           '<span class="diff mono ' + a.dir + '">' + (a.chg === null ? "" : signed(a.chg, dec)) + '</span>' +
           '<span class="per">' + esc(a.label) + '</span></div>' +
         (a.day ? '<div class="day">前日比 <b class="' + dirOf(a.day.chg) + '">' +
             (a.day.pct > 0 ? "+" : "") + a.day.pct.toFixed(2) + "% / " + signed(a.day.chg, dec) + '</b></div>' : "") +
-        (d.err ? '<div class="day"><b class="down">更新に失敗（前回の値を表示）</b></div>' : "");
+        (d.err ? '<div class="day"><b class="down">更新に失敗（前回の値）</b></div>' : "");
     }
     card.innerHTML = head + body;
 
@@ -750,24 +906,28 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
     b.type="button"; b.className="ico"+(extra?" "+extra:""); b.textContent=g; b.title=label;
     b.setAttribute("aria-label",label); b.addEventListener("click",fn); return b;
   }
-  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
 
-  /* ---------- list ops ---------- */
+  /* ---------------- list ops ---------------- */
   function add(raw){
     var sym = normalize(raw);
-    if(!sym || state.list.indexOf(sym) > -1) return;
-    state.list.unshift(sym); save(); render();
+    if(!sym) return;
+    var c = catOf(sym);
+    if(state.lists[c].indexOf(sym) > -1){ if(state.tab !== c) switchTab(c); return; }
+    state.lists[c].unshift(sym);
+    save();
+    if(state.tab !== c){ switchTab(c); return; }
+    renderTabs(); render();
     var p = MOCK ? Promise.resolve(mockData(sym, state.range)) : getData(sym, state.range);
     p.then(function(d){ cache[sym] = d; }, function(e){ cache[sym] = { err:(e && e.message) || "取得失敗" }; })
-     .then(function(){ lastUpdate = Date.now(); render(); stamp(); });
+     .then(function(){ lastUpdate = Date.now(); render(); stamp(curList()); });
   }
-  function remove(i){ state.list.splice(i,1); save(); render(); }
+  function remove(i){ curList().splice(i,1); save(); renderTabs(); render(); }
   function move(i,d){
-    var j = i + d;
-    if(j < 0 || j >= state.list.length) return;
-    var t = state.list[i]; state.list[i] = state.list[j]; state.list[j] = t; save(); render();
+    var l = curList(), j = i + d;
+    if(j < 0 || j >= l.length) return;
+    var t = l[i]; l[i] = l[j]; l[j] = t; save(); render();
   }
-  function reorder(f,t){ if(f===t) return; var it = state.list.splice(f,1)[0]; state.list.splice(t,0,it); save(); render(); }
+  function reorder(f,t){ var l = curList(); if(f===t) return; var it = l.splice(f,1)[0]; l.splice(t,0,it); save(); render(); }
   var dragFrom = null;
   function wireDrag(card){
     card.addEventListener("dragstart", function(e){
@@ -784,7 +944,194 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
     });
   }
 
-  /* ---------- detail ---------- */
+  /* ---------------- news ---------------- */
+  var NEWS_CATS = [
+    { id:"all",       label:"総合" },
+    { id:"jp",        label:"日本株" },
+    { id:"us",        label:"米国株" },
+    { id:"crypto",    label:"暗号資産" },
+    { id:"commodity", label:"商品" }
+  ];
+  function GN(q, en){
+    return "https://news.google.com/rss/search?q=" + encodeURIComponent(q + " when:2d") +
+      (en ? "&hl=en-US&gl=US&ceid=US:en" : "&hl=ja&gl=JP&ceid=JP:ja");
+  }
+  var NEWS_FEEDS = {
+    jp:[
+      { n:"日本株", u:GN("日経平均 OR 東証 OR 日本株 OR 決算発表") },
+      { n:"個別株", u:GN("株価 OR 上方修正 OR 自社株買い OR 増配") }
+    ],
+    us:[
+      { n:"米国株", u:GN("米国株 OR NYダウ OR ナスダック OR S&P500 OR FRB") },
+      { n:"Yahoo Finance", u:"https://finance.yahoo.com/news/rssindex" }
+    ],
+    crypto:[
+      { n:"暗号資産", u:GN("ビットコイン OR 暗号資産 OR イーサリアム OR 仮想通貨") },
+      { n:"CoinDesk", u:"https://www.coindesk.com/arc/outboundfeeds/rss/" }
+    ],
+    commodity:[
+      { n:"商品", u:GN("原油価格 OR 金価格 OR 商品先物 OR 天然ガス OR OPEC") }
+    ]
+  };
+  var SOURCES = [
+    { t:"moomoo証券 ニュース", u:"https://www.moomoo.com/jp/news" },
+    { t:"楽天証券 マーケット", u:"https://www.rakuten-sec.co.jp/web/market/" },
+    { t:"SBI証券 マーケット", u:"https://site1.sbisec.co.jp/ETGate/" },
+    { t:"マネックス証券", u:"https://info.monex.co.jp/news/index.html" },
+    { t:"松井証券 マーケット", u:"https://www.matsui.co.jp/market/" },
+    { t:"auカブコム証券", u:"https://kabu.com/investment/topics/" },
+    { t:"Yahoo Finance（英語）", u:"https://finance.yahoo.com/" },
+    { t:"Yahoo!ファイナンス", u:"https://finance.yahoo.co.jp/" },
+    { t:"株探", u:"https://kabutan.jp/" },
+    { t:"みんかぶ", u:"https://minkabu.jp/" },
+    { t:"ロイター マーケット", u:"https://jp.reuters.com/markets/" },
+    { t:"Bloomberg 日本語版", u:"https://www.bloomberg.co.jp/" },
+    { t:"日本経済新聞 マーケット", u:"https://www.nikkei.com/markets/" },
+    { t:"CoinDesk JAPAN", u:"https://www.coindeskjapan.com/" }
+  ];
+  var newsCache = {};
+
+  function parseFeed(text){
+    var items = [], m;
+    var re = /<item[\s\S]{0,5000}?<\/item>/g;
+    while((m = re.exec(text)) && items.length < 60){
+      var b = m[0];
+      var t = (b.match(/<title>([\s\S]*?)<\/title>/) || [])[1] || "";
+      var l = (b.match(/<link>([\s\S]*?)<\/link>/) || [])[1] || "";
+      var d = (b.match(/<pubDate>([\s\S]*?)<\/pubDate>/) || [])[1] || "";
+      var srcTag = (b.match(/<source[^>]*>([\s\S]*?)<\/source>/) || [])[1] || "";
+      t = t.replace(/<!\[CDATA\[|\]\]>/g,"").replace(/&lt;[^&]*&gt;/g,"").trim();
+      l = l.replace(/<!\[CDATA\[|\]\]>/g,"").trim();
+      if(t) items.push({ title:t, link:l, date:d.trim(), src:srcTag.replace(/<!\[CDATA\[|\]\]>/g,"").trim() });
+    }
+    if(!items.length){
+      var re2 = /\[([^\]\n]{10,140})\]\((https?:\/\/[^)\s]+)\)/g, m2;
+      while((m2 = re2.exec(text)) && items.length < 40){
+        if(/^(http|www\.)/i.test(m2[1])) continue;
+        items.push({ title:m2[1].trim(), link:m2[2], date:"", src:"" });
+      }
+    }
+    return items;
+  }
+  function relTime(s){
+    if(!s) return "";
+    var d = new Date(s);
+    if(isNaN(d.getTime())) return "";
+    var mins = Math.round((Date.now() - d.getTime()) / 60000);
+    if(mins < 1) return "たった今";
+    if(mins < 60) return mins + "分前";
+    if(mins < 1440) return Math.round(mins/60) + "時間前";
+    return d.toLocaleDateString("ja-JP", { month:"numeric", day:"numeric" });
+  }
+  function renderNewsTabs(){
+    var seg = document.getElementById("news-seg");
+    seg.textContent = "";
+    NEWS_CATS.forEach(function(c){
+      var b = document.createElement("button");
+      b.type = "button"; b.textContent = c.label;
+      b.setAttribute("aria-pressed", String(c.id === state.newsCat));
+      b.addEventListener("click", function(){ state.newsCat = c.id; save(); renderNewsTabs(); loadNews(); });
+      seg.appendChild(b);
+    });
+  }
+  function renderSources(){
+    var box = document.getElementById("news-sources");
+    if(box.childElementCount) return;
+    var lab = document.createElement("div");
+    lab.className = "lab"; lab.textContent = "各社マーケット情報ページ";
+    box.appendChild(lab);
+    SOURCES.forEach(function(s2){
+      var a = document.createElement("a");
+      a.href = s2.u; a.target = "_blank"; a.rel = "noopener"; a.textContent = s2.t;
+      box.appendChild(a);
+    });
+  }
+  function feedsFor(cat){
+    if(cat !== "all") return NEWS_FEEDS[cat].map(function(f){ return { n:f.n, u:f.u, cat:cat }; });
+    var out = [];
+    ["jp","us","crypto","commodity"].forEach(function(c){ out.push({ n:NEWS_FEEDS[c][0].n, u:NEWS_FEEDS[c][0].u, cat:c }); });
+    return out;
+  }
+  function catLabel(id){
+    for(var i=0;i<NEWS_CATS.length;i++) if(NEWS_CATS[i].id === id) return NEWS_CATS[i].label;
+    return "";
+  }
+  function loadNews(force){
+    var cat = state.newsCat || "all";
+    var box = document.getElementById("news"), note = document.getElementById("news-note");
+    renderSources();
+    var hit = newsCache[cat];
+    if(hit && !force && Date.now() - hit.at < 600000){ paintNews(hit.items, hit.srcs, hit.at); return; }
+    box.innerHTML = '<div class="tile-err">ニュースを読み込み中…</div>';
+    note.textContent = "";
+    if(MOCK){
+      var demo = [];
+      ["jp","us","crypto","commodity"].forEach(function(c){
+        for(var k=0;k<4;k++) demo.push({ title:"【サンプル見出し " + (k+1) + "】" + catLabel(c) + "市場の動向に関するダミー記事 - サンプル通信",
+          link:"#", date:new Date(Date.now() - (k+1)*37*60000).toUTCString(), src:"", cat:c });
+      });
+      if(cat !== "all") demo = demo.filter(function(x){ return x.cat === cat; });
+      paintNews(demo, ["サンプル"], Date.now());
+      return;
+    }
+    var feeds = feedsFor(cat), all = [], srcs = [], done = 0;
+    feeds.forEach(function(f, i){
+      setTimeout(function(){
+        grabText("https://r.jina.ai/" + f.u, null, 18000)
+          .then(function(txt){
+            var items = parseFeed(txt);
+            if(items.length){
+              srcs.push(f.n);
+              items.forEach(function(it){ it.cat = f.cat; all.push(it); });
+            }
+          })
+          .catch(function(){})
+          .then(function(){
+            done++;
+            if(done === feeds.length){
+              var seen = {}, merged = [];
+              all.forEach(function(it){
+                var key = it.title.replace(/\s+/g,"").slice(0,40);
+                if(!seen[key]){ seen[key] = 1; merged.push(it); }
+              });
+              merged.sort(function(a, b){
+                var ta = Date.parse(a.date) || 0, tb = Date.parse(b.date) || 0;
+                return tb - ta;
+              });
+              merged = merged.slice(0, 45);
+              newsCache[cat] = { items:merged, srcs:srcs, at:Date.now() };
+              paintNews(merged, srcs, Date.now());
+            }
+          });
+      }, i * 260);
+    });
+  }
+  function paintNews(items, srcs, at){
+    var box = document.getElementById("news"), note = document.getElementById("news-note");
+    box.textContent = "";
+    if(!items.length){
+      note.textContent = "ニュースを取得できませんでした。下の各社ページからご確認ください。";
+      box.innerHTML = '<div class="tile-err"><b>取得できませんでした</b>時間をおいて「更新」をお試しください。</div>';
+      return;
+    }
+    var t = new Date(at), p2 = function(n){ return ("0"+n).slice(-2); };
+    note.textContent = "出典: " + (srcs.join("・") || "—") + " ／ " + p2(t.getHours()) + ":" + p2(t.getMinutes()) + " 取得";
+    items.forEach(function(it){
+      var a = document.createElement("a");
+      a.className = "nitem"; a.href = it.link || "#"; a.target = "_blank"; a.rel = "noopener";
+      var parts = it.title.split(" - ");
+      var src = it.src || (parts.length > 1 ? parts.pop() : "");
+      var meta = "";
+      if(state.newsCat === "all" && it.cat) meta += '<span class="ncat">' + esc(catLabel(it.cat)) + '</span>';
+      if(src) meta += '<span>' + esc(src) + '</span>';
+      if(relTime(it.date)) meta += '<span>' + esc(relTime(it.date)) + '</span>';
+      a.innerHTML = '<span class="t">' + esc(parts.join(" - ")) + '</span><span class="m">' + meta + '</span>';
+      box.appendChild(a);
+    });
+  }
+  document.getElementById("news-reload").addEventListener("click", function(){ loadNews(true); });
+
+  /* ---------------- detail ---------------- */
   var dlg = document.getElementById("detail"), dlgSym = null, dlgRange = "1d";
   function openDetail(sym){
     dlgSym = sym; dlgRange = state.range;
@@ -797,8 +1144,7 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
     loadDetail();
   }
   function loadDetail(){
-    var sym = dlgSym;
-    var box = document.getElementById("dlg-chart");
+    var sym = dlgSym, box = document.getElementById("dlg-chart");
     box.innerHTML = '<div class="tile-err">読み込み中…</div>';
     var p = MOCK ? Promise.resolve(mockData(sym, dlgRange)) : getData(sym, dlgRange);
     p.then(function(d){ if(dlgSym === sym) drawDetail(d); },
@@ -808,17 +1154,16 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
     if(!d || d.price == null) return;
     var a = analyse(dlgSym, d, dlgRange);
     var dec = decimalsFor(dlgSym, a.last, d.meta);
-    var sp = splitNum(a.last, dec);
-    var meta = d.meta || {};
+    var sp = splitNum(a.last, dec), meta = d.meta || {};
     document.getElementById("dlg-price").innerHTML =
       '<span class="int mono">' + sp.int + '</span><span class="dec mono">' + sp.dec + '</span>' +
       (meta.currency ? '<span class="cur">' + esc(meta.currency) + '</span>' : "") +
       '<span class="pct mono ' + a.dir + '">' + (a.pct === null ? "—" : (a.pct > 0 ? "+" : "") + a.pct.toFixed(2)) + '<span class="u">%</span></span>' +
       '<span class="diff mono ' + a.dir + '">' + (a.chg === null ? "" : signed(a.chg, dec)) + '</span>';
     document.getElementById("dlg-chart").innerHTML =
-      chartSvg(d.series, a.base, a.dir, { big:true, hgrid:true, vgrid:6 }) + gutter(a, dec);
+      chartSvg(d.series, a, { big:true, hgrid:4, vgrid:6 }) + gutterHtml(a, dec, true) + xAxisHtml(d.series, dlgRange);
     var rows = [
-      [a.label + "の騰落率", (a.pct === null ? "—" : (a.pct > 0 ? "+" : "") + a.pct.toFixed(2) + "%")],
+      [a.label + "の騰落率", a.pct === null ? "—" : (a.pct > 0 ? "+" : "") + a.pct.toFixed(2) + "%"],
       [a.label + "の基準値", fmt(a.base, dec)],
       [a.label + "の高値", fmt(a.hi, dec)],
       [a.label + "の安値", fmt(a.lo, dec)],
@@ -843,7 +1188,7 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
   document.getElementById("dlg-close").addEventListener("click", function(){ dlg.close(); });
   dlg.addEventListener("close", function(){ dlgSym = null; });
 
-  /* ---------- controls ---------- */
+  /* ---------------- controls ---------------- */
   document.getElementById("add-form").addEventListener("submit", function(e){
     e.preventDefault();
     var input = document.getElementById("sym-input");
@@ -873,31 +1218,27 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
     editBtn.setAttribute("aria-pressed", String(on));
     editBtn.textContent = on ? "編集を終える" : "編集";
   });
-  document.getElementById("reload-btn").addEventListener("click", function(){ refresh(); });
+  document.getElementById("reload-btn").addEventListener("click", function(){
+    if(state.tab === "news") loadNews(true); else refresh();
+  });
   document.getElementById("share-btn").addEventListener("click", function(){
-    var url = location.href.split("#")[0] + "#s=" + encodeURIComponent(state.list.join(",")) + "&r=" + state.range;
+    var parts = [];
+    Object.keys(state.lists).forEach(function(c){ if(state.lists[c].length) parts.push(c + "=" + encodeURIComponent(state.lists[c].join(","))); });
+    parts.push("r=" + state.range, "t=" + state.tab);
+    var url = location.href.split("#")[0] + "#" + parts.join("&");
     history.replaceState(null, "", url);
     var b = this, done = function(ok){ b.textContent = ok ? "コピー済" : "URL反映"; setTimeout(function(){ b.textContent = "共有URL"; }, 1600); };
     if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(function(){done(true);},function(){done(false);});
     else done(false);
   });
   document.getElementById("reset-btn").addEventListener("click", function(){
-    if(!confirm("登録銘柄を初期状態に戻しますか？")) return;
-    state.list = DEFAULTS.slice();
-    history.replaceState(null, "", location.href.split("#")[0]);
-    save(); render(); refresh();
+    if(!confirm("このタブの銘柄を初期状態に戻しますか？")) return;
+    if(PRESETS[state.tab]) state.lists[state.tab] = PRESETS[state.tab].slice();
+    save(); renderTabs(); render(); refresh();
   });
-  window.addEventListener("hashchange", function(){ readHash(); paintSeg(); save(); render(); refresh(); });
+  window.addEventListener("hashchange", function(){ readHash(); paintSeg(); save(); renderTabs(); render(); refresh(); });
 
-  var chips = document.getElementById("empty-chips");
-  ["7203","6758","8035","9432","AAPL","NVDA","日経","ドル円","ビットコイン"].forEach(function(s){
-    var c = document.createElement("button");
-    c.type="button"; c.className="chip"; c.textContent=s;
-    c.addEventListener("click", function(){ add(s); });
-    chips.appendChild(c);
-  });
-
-  /* ---------- clocks ---------- */
+  /* ---------------- clocks ---------------- */
   function zoneNow(tz){
     var f = new Intl.DateTimeFormat("en-US",{ timeZone:tz, hour12:false, weekday:"short", hour:"2-digit", minute:"2-digit" });
     var parts = {}, arr = f.formatToParts(new Date());
@@ -930,13 +1271,22 @@ dialog::backdrop{background:rgba(5,8,13,.66)}
     document.getElementById("ny-dot").className = "dot " + c2;
   }
 
-  /* ---------- boot ---------- */
-  load(); applyTheme(); themeSel.value = state.theme; paintSeg(); render(); tick();
+  /* ---------------- boot ---------------- */
+  load(); applyTheme(); themeSel.value = state.theme; paintSeg();
+  if(!CATS.some(function(c){ return c.id === state.tab; })) state.tab = "jp";
+  renderTabs();
+  toolbar.hidden = state.tab === "news";
+  newsPanel.hidden = state.tab !== "news";
+  grid.hidden = state.tab === "news";
+  if(state.tab === "news"){ renderNewsTabs(); loadNews(); }
+  render(); tick();
   setInterval(tick, 20000);
   refresh();
-  setInterval(function(){ if(document.visibilityState === "visible") refresh(); }, state.range === "1d" ? 90000 : 300000);
+  setInterval(function(){
+    if(document.visibilityState === "visible" && state.tab !== "news") refresh();
+  }, 90000);
   document.addEventListener("visibilitychange", function(){
-    if(document.visibilityState === "visible" && Date.now() - lastUpdate > 60000) refresh();
+    if(document.visibilityState === "visible" && state.tab !== "news" && Date.now() - lastUpdate > 90000) refresh();
   });
 })();
 </script>
